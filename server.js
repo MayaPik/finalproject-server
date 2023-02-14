@@ -24,19 +24,19 @@ app.post(`/api/login/:userType`, async (req, res) => {
     const result = await knex(`${userType}`).where({ username });
 
     if (result.length !== 1) {
-      return res.json({ error_message: "Wrong username/password" });
+      return res.json({ error_message: "No username" });
     }
     const isMatch = await bcrypt.compare(password, result[0].password);
     if (!isMatch) {
       return res.json({ error_message: "Wrong username/password" });
+    } else {
+      res.json({
+        message: "login successfully",
+        data: {
+          username: result[0].username,
+        },
+      });
     }
-
-    res.json({
-      message: "login successfully",
-      data: {
-        username: result[0].username,
-      },
-    });
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server error");
