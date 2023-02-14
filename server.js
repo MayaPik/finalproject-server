@@ -26,7 +26,7 @@ app.post(`/api/login/:userType`, async (req, res) => {
     if (result.length !== 1) {
       return res.json({ error_message: "No username" });
     }
-    const isMatch = await compare(password, result[0].password);
+    const isMatch = await bcrypt.compare(password, result[0].password);
     if (!isMatch) {
       return res.json({ error_message: "Wrong username/password" });
     } else {
