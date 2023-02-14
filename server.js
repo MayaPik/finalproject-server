@@ -16,7 +16,8 @@ app.use(cors());
 
 app.set("db", knex);
 
-app.post(`/api/login/${userType}`, async (req, res) => {
+app.post(`/api/login/:userType`, async (req, res) => {
+  const userType = req.params.userType;
   const { username, password } = req.body;
 
   try {
