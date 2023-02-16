@@ -32,8 +32,7 @@ app.post(`/api/login/:userType`, async (req, res) => {
       res.json({
         message: "login successfully",
         data: {
-          username: result[0].username,
-          id: result[0][usertypeid],
+          user: result[0],
         },
       });
     }
