@@ -19,10 +19,8 @@ app.set("db", knex);
 app.post(`/api/login/:userType`, async (req, res) => {
   const userType = req.params.userType;
   const { username, password } = req.body;
-
   try {
     const result = await knex(`${userType}`).where({ username });
-
     if (result.length !== 1) {
       return res.json({ error_message: "No username" });
     }
