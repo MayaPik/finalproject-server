@@ -18,6 +18,7 @@ app.set("db", knex);
 
 app.post(`/api/login/:userType`, async (req, res) => {
   const userType = req.params.userType;
+  const usertypeid = `${userType}id`;
   const { username, password } = req.body;
   try {
     const result = await knex(`${userType}`).where({ username });
@@ -32,7 +33,7 @@ app.post(`/api/login/:userType`, async (req, res) => {
         message: "login successfully",
         data: {
           username: result[0].username,
-          id: result[0],
+          id: result[0][usertypeid],
         },
       });
     }
