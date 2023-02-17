@@ -76,7 +76,7 @@ app.post(`/api/fixed`, async (req, res) => {
   }
 });
 
-app.post(`/api/fixed/:day/:hour`, async (req, res) => {
+app.post(`/api/fixed/:day/:time`, async (req, res) => {
   const day = req.params.day;
   const time = req.params.time;
   try {
