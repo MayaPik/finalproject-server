@@ -18,7 +18,6 @@ app.set("db", knex);
 
 app.post(`/api/login/:userType`, async (req, res) => {
   const userType = req.params.userType;
-  const usertypeid = `${userType}id`;
   const { username, password } = req.body;
   try {
     const result = await knex(`${userType}`).where({ username });
@@ -41,4 +40,52 @@ app.post(`/api/login/:userType`, async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
+app.post(`/api/fixed`, async (req, res) => {
+  const { childid, day, time } = req.body;
+  try {
+    const result = await knex("fixed").where({ childid, day });
+    if (result.length === 0) {
+      await knex("fixed").insert({ childid, day, time });
+    } else {
+      await knex.raw(
+        `
+        INSERT INTO fixed (childid, day, time)
+        VALUES (?, ?, ?)
+        ON CONFLICT (childid, day)
+        DO UPDATE SET time = ?
+      `,
+        [childid, day, time, time]
+      );
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server error");
+  }
+});
+app.post(`/api/ongoing`, async (req, res) => {
+  const { childid, day, time, date } = req.body;
+  try {
+    const result = await knex("ongoing").where({ childid, day, date });
+    if (result.length === 0) {
+      await knex("ongoing").insert({ childid, day, time, date });
+    } else {
+      await knex.raw(
+        `
+        INSERT INTO ongoing (childid, day, time, date)
+        VALUES (?, ?, ?, ?)
+        ON CONFLICT (childid, day, date)
+        DO UPDATE SET time = ?
+      `,
+        [childid, day, time, date, time]
+      );
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server error");
+  }
+});
+
 app.listen(process.env.PORT);
