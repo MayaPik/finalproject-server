@@ -48,10 +48,7 @@ app.post(`/api/fixed`, async (req, res) => {
     if (result.length === 0) {
       await knex("fixed").insert({ childid, day, time });
     } else {
-      await knex("fixed")
-        .insert({ childid, day, time })
-        .onConflict(["childid", "day"])
-        .merge({ time });
+      await knex("fixed").where({ childid, day, date }).update({ time });
     }
     res.json({ success: true });
   } catch (err) {
@@ -66,10 +63,7 @@ app.post(`/api/ongoing`, async (req, res) => {
     if (result.length === 0) {
       await knex("ongoing").insert({ childid, day, time, date });
     } else {
-      await knex("ongoing")
-        .insert({ childid, day, time, date })
-        .onConflict(["childid", "day"])
-        .merge({ time });
+      await knex("ongoing").where({ childid, day, date }).update({ time });
     }
     res.json({ success: true });
   } catch (err) {
