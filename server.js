@@ -48,7 +48,7 @@ app.post(`/api/fixed`, async (req, res) => {
     if (result.length === 0) {
       await knex("fixed").insert({ childid, day, time });
     } else {
-      await knex("fixed").where({ childid, day, date }).update({ time });
+      await knex("fixed").where({ childid, day }).update({ time });
     }
     res.json({ success: true });
   } catch (err) {
