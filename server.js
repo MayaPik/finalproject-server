@@ -41,6 +41,24 @@ app.post(`/api/login/:userType`, async (req, res) => {
   }
 });
 
+app.post(`/api/childrenid/:guideid`, async (req, res) => {
+  const guideid = req.params.guideid;
+
+  try {
+    const result = await knex(`child`).where({ guideid: guideid });
+    if (result.length !== 1) {
+      return res.json({ error_message: "No children for this hour" });
+    } else {
+      res.json({
+        data: result,
+      });
+    }
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server error");
+  }
+});
+
 app.post(`/api/fixed`, async (req, res) => {
   const { childid, day, time } = req.body;
   try {
