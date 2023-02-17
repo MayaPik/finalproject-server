@@ -48,15 +48,10 @@ app.post(`/api/fixed`, async (req, res) => {
     if (result.length === 0) {
       await knex("fixed").insert({ childid, day, time });
     } else {
-      await knex.raw(
-        `
-        INSERT INTO fixed (childid, day, time)
-        VALUES (?, ?, ?)
-        ON CONFLICT (childid, day)
-        DO UPDATE SET time = ?
-      `,
-        [childid, day, time, time]
-      );
+      await knex("fixed")
+        .insert({ childid, day, time })
+        .onConflict(["childid", "day"])
+        .merge({ time });
     }
     res.json({ success: true });
   } catch (err) {
@@ -71,15 +66,10 @@ app.post(`/api/ongoing`, async (req, res) => {
     if (result.length === 0) {
       await knex("ongoing").insert({ childid, day, time, date });
     } else {
-      await knex.raw(
-        `
-        INSERT INTO ongoing (childid, day, time, date)
-        VALUES (?, ?, ?, ?)
-        ON CONFLICT (childid, day, date)
-        DO UPDATE SET time = ?
-      `,
-        [childid, day, time, date, time]
-      );
+      await knex("ongoing")
+        .insert({ childid, day, time, date })
+        .onConflict(["childid", "day"])
+        .merge({ time });
     }
     res.json({ success: true });
   } catch (err) {
