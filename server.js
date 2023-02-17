@@ -78,9 +78,9 @@ app.post(`/api/fixed`, async (req, res) => {
 
 app.post(`/api/fixed/:day/:hour`, async (req, res) => {
   const day = req.params.day;
-  const hour = req.params.hour;
+  const time = req.params.time;
   try {
-    const result = await knex("fixed").where({ day: day, hour: hour });
+    const result = await knex("fixed").where({ day: day, time: time });
     if (result.length !== 1) {
       return res.json({ error_message: "No children for this hour" });
     } else {
