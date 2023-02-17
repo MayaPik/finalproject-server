@@ -50,6 +50,7 @@ app.post(`/api/childrenid/:guideid`, async (req, res) => {
       return res.json({ error_message: "No children for this hour" });
     } else {
       res.json({
+        message: "successfull",
         data: result,
       });
     }
@@ -74,6 +75,26 @@ app.post(`/api/fixed`, async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
+app.post(`/api/fixed/:day/:hour`, async (req, res) => {
+  const day = req.params.day;
+  const hour = req.params.hour;
+  try {
+    const result = await knex("fixed").where({ day: day, hour: hour });
+    if (result.length !== 1) {
+      return res.json({ error_message: "No children for this hour" });
+    } else {
+      res.json({
+        message: "successfull",
+        data: result,
+      });
+    }
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server error");
+  }
+});
+
 app.post(`/api/ongoing`, async (req, res) => {
   const { childid, day, time, date } = req.body;
   try {
