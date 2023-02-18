@@ -100,29 +100,29 @@ app.get(`/api/getAllChildrenOfHour`, async (req, res) => {
 
   try {
     const result = await knex
-      .select("children.childid", "children.first_name", "children.last_name")
-      .from("children")
+      .select("child.childid", "child.first_name", "child.last_name")
+      .from("child")
       .leftJoin("fixed", function () {
-        this.on("children.childid", "=", "fixed.childid")
-          .andOn("children.guideid", "=", knex.raw("?", [guideid]))
+        this.on("child.childid", "=", "fixed.childid")
+          .andOn("child.guideid", "=", knex.raw("?", [guideid]))
           .andOn("fixed.day", "=", knex.raw("?", [day]))
           .andOn("fixed.time", "=", knex.raw("?", [time]));
       })
       .leftJoin("ongoing", function () {
-        this.on("children.childid", "=", "ongoing.childid")
-          .andOn("children.guideid", "=", knex.raw("?", [guideid]))
+        this.on("child.childid", "=", "ongoing.childid")
+          .andOn("child.guideid", "=", knex.raw("?", [guideid]))
           .andOn("ongoing.day", "=", knex.raw("?", [day]))
           .andOn("ongoing.time", "=", knex.raw("?", [time]))
           .andOn("ongoing.date", "=", knex.raw("?", [date]));
       })
       .whereNotNull("fixed.childid")
       .orWhereNotNull("ongoing.childid")
-      .orderBy("children.childid")
-      .orderBy("children.day")
-      .orderBy("children.hour")
-      .groupBy("children.childid");
-    // .havingRaw("MAX(ongoing.childid) IS NOT NULL")
-    // .select("children.childid", "children.first_name", "children.last_name");
+      .orderBy("child.childid")
+      .orderBy("child.day")
+      .orderBy("child.hour")
+      .groupBy("child.childid")
+      .havingRaw("MAX(ongoing.childid) IS NOT NULL")
+      .select("children.childid", "children.first_name", "children.last_name");
 
     if (result.length === 0) {
       return res.json({ error_message: "No children for this hour" });
