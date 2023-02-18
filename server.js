@@ -120,9 +120,8 @@ app.get(`/api/getAllChildrenOfHour`, async (req, res) => {
       .orderBy("child.childid")
       .orderBy("child.day")
       .orderBy("child.hour")
-      .groupBy("child.childid")
-      .havingRaw("MAX(ongoing.childid) IS NOT NULL")
-      .select("children.childid", "children.first_name", "children.last_name");
+      .groupBy("child.childid", "child.first_name", "child.last_name")
+      .havingRaw("MAX(ongoing.childid) IS NOT NULL");
 
     if (result.length === 0) {
       return res.json({ error_message: "No children for this hour" });
@@ -135,7 +134,7 @@ app.get(`/api/getAllChildrenOfHour`, async (req, res) => {
         };
       });
       res.json({
-        message: "successfull",
+        message: "successful",
         data: children,
       });
     }
