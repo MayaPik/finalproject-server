@@ -147,7 +147,7 @@ app.get(`/api/getClassName`, async (req, res) => {
     const query = knex
       .select("class.classid", "class.class_name")
       .from("class")
-      .where((classid = classid));
+      .where("classid", classid);
 
     const result = await query;
 
