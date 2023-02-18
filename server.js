@@ -117,9 +117,6 @@ app.get(`/api/getAllChildrenOfHour`, async (req, res) => {
       })
       .whereNotNull("fixed.childid")
       .orWhereNotNull("ongoing.childid")
-      .orderBy("child.childid")
-      .orderBy("child.day")
-      .orderBy("child.hour")
       .groupBy("child.childid", "child.first_name", "child.last_name")
       .havingRaw("MAX(ongoing.childid) IS NOT NULL");
 
