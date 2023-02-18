@@ -41,25 +41,6 @@ app.post(`/api/:userType/login`, async (req, res) => {
   }
 });
 
-// app.post(`/api/childrenid/:guideid`, async (req, res) => {
-//   const guideid = req.params.guideid;
-
-//   try {
-//     const result = await knex(`child`).where({ guideid: guideid });
-//     if (result.length !== 1) {
-//       return res.json({ error_message: "No children for this hour" });
-//     } else {
-//       res.json({
-//         message: "successfull",
-//         data: result,
-//       });
-//     }
-//   } catch (err) {
-//     console.error(err.message);
-//     res.status(500).send("Server error");
-//   }
-// });
-
 app.post(`/api/updateFixedTimes`, async (req, res) => {
   const { childid, day, time } = req.body;
   try {
@@ -99,26 +80,43 @@ app.get(`/api/getAllChildrenOfHour`, async (req, res) => {
   const date = req.query.date;
 
   try {
-    const result = await knex
-      .select("child.childid", "child.first_name", "child.last_name")
+    const query = knex
+      .select(
+        "child.childid",
+        "child.first_name",
+        "child.last_name",
+        "child.classid"
+      )
       .from("child")
       .leftJoin("fixed", function () {
         this.on("child.childid", "=", "fixed.childid")
-          .andOn("child.guideid", "=", knex.raw("?", [guideid]))
           .andOn("fixed.day", "=", knex.raw("?", [day]))
           .andOn("fixed.time", "=", knex.raw("?", [time]));
+        if (guideid) {
+          this.andOn("child.guideid", "=", knex.raw("?", [guideid]));
+        }
       })
       .leftJoin("ongoing", function () {
         this.on("child.childid", "=", "ongoing.childid")
-          .andOn("child.guideid", "=", knex.raw("?", [guideid]))
           .andOn("ongoing.day", "=", knex.raw("?", [day]))
           .andOn("ongoing.time", "=", knex.raw("?", [time]))
           .andOn("ongoing.date", "=", knex.raw("?", [date]));
+        if (guideid) {
+          this.andOn("child.guideid", "=", knex.raw("?", [guideid]));
+        }
       })
-      .whereNotNull("fixed.childid")
-      .orWhereNotNull("ongoing.childid")
-      .groupBy("child.childid", "child.first_name", "child.last_name")
+      .where(function () {
+        this.whereNotNull("fixed.childid").orWhereNotNull("ongoing.childid");
+      })
+      .groupBy(
+        "child.childid",
+        "child.first_name",
+        "child.last_name",
+        "child.classid"
+      )
       .havingRaw("MAX(ongoing.childid) IS NOT NULL");
+
+    const result = await query;
 
     if (result.length === 0) {
       return res.json({ error_message: "No children for this hour" });
@@ -128,6 +126,7 @@ app.get(`/api/getAllChildrenOfHour`, async (req, res) => {
           childid: child.childid,
           first_name: child.first_name,
           last_name: child.last_name,
+          class: child.classid,
         };
       });
       res.json({
