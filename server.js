@@ -91,6 +91,7 @@ app.post(`/api/updateOngoingTimes`, async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
 app.get(`/api/getAllChildrenOfHour`, async (req, res) => {
   const day = req.query.day;
   const time = req.query.time;
@@ -119,15 +120,14 @@ app.get(`/api/getAllChildrenOfHour`, async (req, res) => {
       .orderBy("children.childid")
       .orderBy("children.day")
       .orderBy("children.hour")
-      // Check for duplicates and prioritize ongoing
-      .groupBy("children.childid")
-      .havingRaw("MAX(ongoing.childid) IS NOT NULL")
-      .select("children.childid", "children.first_name", "children.last_name");
+      .groupBy("children.childid");
+    // .havingRaw("MAX(ongoing.childid) IS NOT NULL")
+    // .select("children.childid", "children.first_name", "children.last_name");
 
     if (result.length === 0) {
       return res.json({ error_message: "No children for this hour" });
     } else {
-      const children = result.map((child) => {
+      const children = await result.map((child) => {
         return {
           childid: child.childid,
           first_name: child.first_name,
