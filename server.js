@@ -141,7 +141,7 @@ app.get(`/api/getAllChildrenOfHour`, async (req, res) => {
     }
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server error");
+    res.status(500).send(err.message);
   }
 });
 
