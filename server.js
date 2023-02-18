@@ -140,4 +140,29 @@ app.get(`/api/getAllChildrenOfHour`, async (req, res) => {
   }
 });
 
+app.get(`/api/getClassName`, async (req, res) => {
+  const classid = req.query.classid;
+
+  try {
+    const query = knex
+      .select("class.classid", "class.class_name")
+      .from("class")
+      .where((classid = classid));
+
+    const result = await query;
+
+    if (result.length === 0) {
+      return res.json({ error_message: "No class for the classid" });
+    } else {
+      res.json({
+        message: "successful",
+        class_name: result[0].class_name,
+      });
+    }
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send(err.message);
+  }
+});
+
 app.listen(process.env.PORT);
