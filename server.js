@@ -85,7 +85,11 @@ app.get(`/api/getAllChildrenOfHour`, async (req, res) => {
         "child.childid",
         "child.first_name",
         "child.last_name",
-        "child.classid"
+        "child.classid",
+        knex.raw("CASE WHEN ? = 'else' THEN ongoing.time ELSE ? END AS time", [
+          time,
+          time,
+        ])
       )
       .from("child")
       .leftJoin("fixed", function () {
@@ -131,6 +135,7 @@ app.get(`/api/getAllChildrenOfHour`, async (req, res) => {
           first_name: child.first_name,
           last_name: child.last_name,
           class: child.classid,
+          time: child.time,
         };
       });
       res.json({
