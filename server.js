@@ -72,7 +72,6 @@ app.post(`/api/updateOngoingTimes`, async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-
 app.get(`/api/getAllChildrenOfHour`, async (req, res) => {
   const day = req.query.day;
   const time = req.query.time;
@@ -86,7 +85,7 @@ app.get(`/api/getAllChildrenOfHour`, async (req, res) => {
         "child.first_name",
         "child.last_name",
         "child.classid",
-        knex.raw("CASE WHEN ? = 'else' THEN ongoing.time ELSE ? END AS time", [
+        knex.raw(`CASE WHEN ? = 'else' THEN ongoing.time ELSE ? END AS time`, [
           time,
           time,
         ])
