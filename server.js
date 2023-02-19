@@ -99,8 +99,12 @@ app.get(`/api/getAllChildrenOfHour`, async (req, res) => {
       .leftJoin("ongoing", function () {
         this.on("child.childid", "=", "ongoing.childid")
           .andOn("ongoing.day", "=", knex.raw("?", [day]))
-          .andOn("ongoing.time", "=", knex.raw("?", [time]))
           .andOn("ongoing.date", "=", knex.raw("?", [date]));
+        if (time === "else") {
+          this.andOnNotIn("ongoing.time", ["15:00", "15:30", "00:00"]);
+        } else {
+          this.andOn("ongoing.time", "=", knex.raw("?", [time]));
+        }
         if (guideid) {
           this.andOn("child.guideid", "=", knex.raw("?", [guideid]));
         }
@@ -157,6 +161,24 @@ app.get(`/api/getClassName`, async (req, res) => {
       res.json({
         message: "successful",
         class_name: result[0].class_name,
+      });
+    }
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send(err.message);
+  }
+});
+
+app.get(`/api/getAllChildren`, async (req, res) => {
+  try {
+    const query = knex.select().from("child");
+    const result = await query;
+    if (result.length === 0) {
+      return res.json({ error_message: "No children" });
+    } else {
+      res.json({
+        message: "successful",
+        children: result,
       });
     }
   } catch (err) {
