@@ -120,7 +120,8 @@ app.get(`/api/getAllChildrenOfHour`, async (req, res) => {
         "child.childid",
         "child.first_name",
         "child.last_name",
-        "child.classid"
+        "child.classid",
+        "ongoing.time"
       )
       .havingRaw("MAX(ongoing.childid) IS NOT NULL");
 
