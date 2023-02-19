@@ -7,7 +7,6 @@ const knex = require("knex")({
 });
 
 const bcrypt = require("bcrypt");
-
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
@@ -85,7 +84,7 @@ app.get(`/api/getAllChildrenOfHour`, async (req, res) => {
         "child.first_name",
         "child.last_name",
         "child.classid",
-        knex.raw(`CASE WHEN ? = 'else' THEN ongoing.time ELSE ? END AS time`, [
+        knex.raw("CASE WHEN ? = 'else' THEN ongoing.time ELSE ? END AS time", [
           time,
           time,
         ])
@@ -135,7 +134,7 @@ app.get(`/api/getAllChildrenOfHour`, async (req, res) => {
           first_name: child.first_name,
           last_name: child.last_name,
           class: child.classid,
-          time: child.time,
+          ...(req.query.time === "else" ? { time: child.time } : {}),
         };
       });
       res.json({
