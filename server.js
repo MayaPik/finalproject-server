@@ -171,7 +171,14 @@ app.get(`/api/getClassName`, async (req, res) => {
 
 app.get(`/api/getAllChildren`, async (req, res) => {
   try {
-    const query = knex.select().from("child");
+    const query = knex
+      .select(
+        "child.childid",
+        "child.first_name",
+        "child.last_name",
+        "child.classid"
+      )
+      .from("child");
     const result = await query;
     if (result.length === 0) {
       return res.json({ error_message: "No children" });
