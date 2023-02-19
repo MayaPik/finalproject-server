@@ -19,7 +19,10 @@ app.post(`/api/:userType/login`, async (req, res) => {
   const userType = req.params.userType;
   const { username, password } = req.body;
   try {
-    const result = await knex(`${userType}`).where({ username });
+    const result = await knex(`${userType}`)
+      .select("*")
+      .where({ username })
+      .andWhereNot({ password });
     if (result.length !== 1) {
       return res.json({ error_message: "No username" });
     }
@@ -27,10 +30,12 @@ app.post(`/api/:userType/login`, async (req, res) => {
     if (!isMatch) {
       return res.json({ error_message: "Wrong username/password" });
     } else {
+      const user = { ...result[0] };
+      delete user.password;
       res.json({
         message: "login successfully",
         data: {
-          user: result[0],
+          user,
         },
       });
     }
