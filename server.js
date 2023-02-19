@@ -176,9 +176,17 @@ app.get(`/api/getAllChildren`, async (req, res) => {
     if (result.length === 0) {
       return res.json({ error_message: "No children" });
     } else {
+      const children = await result.map((child) => {
+        return {
+          childid: child.childid,
+          first_name: child.first_name,
+          last_name: child.last_name,
+          class: child.classid,
+        };
+      });
       res.json({
         message: "successful",
-        children: result,
+        data: children,
       });
     }
   } catch (err) {
