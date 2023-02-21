@@ -29,5 +29,6 @@
   "bugs": {
     "url": "https://github.com/MayaPik/finalproject-serverside/issues"
   },
-  "homepage": "https://github.com/MayaPik/finalproject-serverside#readme"
+  "homepage": "https://github.com/MayaPik/finalproject-serverside#readme",
+  "devDependencies": {}
 }
