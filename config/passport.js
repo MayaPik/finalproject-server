@@ -31,20 +31,36 @@ passport.use(
   )
 );
 passport.serializeUser((user, done) => {
-  const userType = req.params.userType;
+  const userType = user.userType;
   const table = userType === "child" ? "guide" : "admin";
-
   done(null, user[`${table}id`]);
 });
 
-passport.deserializeUser((id, userType, done) => {
-  const table = userType === "child" ? "guide" : "admin";
-
-  knex(table)
-    .where(`${table}id`)
+passport.deserializeUser((id, done) => {
+  knex("admin")
+    .where({ adminid: id })
     .first()
     .then((user) => {
-      done(null, user);
+      if (!user) {
+        return knex("guide")
+          .where({ guideid: id })
+          .first()
+          .then((user) => {
+            if (!user) {
+              return knex("child")
+                .where({ childid: id })
+                .first()
+                .then((user) => {
+                  if (!user) {
+                    return done(new Error("Invalid user id"));
+                  }
+                  done(null, { ...user, userType: "child" });
+                });
+            }
+            done(null, { ...user, userType: "guide" });
+          });
+      }
+      done(null, { ...user, userType: "admin" });
     })
     .catch((err) => done(err));
 });
