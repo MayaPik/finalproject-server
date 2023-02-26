@@ -7,26 +7,28 @@ const knex = require("knex")({
   client: "pg",
   connection: process.env.DATABASE_URL,
 });
-const options = {
-  usernameField: "username",
-  passwordField: "password",
-  passReqToCallback: true,
-};
 
 passport.use(
-  new LocalStrategy(options, async (req, username, password, done) => {
-    const userType = req.query.userType;
-    const user = await knex(userType).where({ username: username }).first();
-    if (!user) {
-      return done(null, false);
+  new LocalStrategy(
+    {
+      usernameField: "username",
+      passwordField: "password",
+      passReqToCallback: true,
+    },
+    async (req, username, password, done) => {
+      const userType = req.query.userType;
+      const user = await knex(userType).where({ username: username }).first();
+      if (!user) {
+        return done(null, false);
+      }
+      const match = await bcrypt.compare(password, user.password);
+      if (match) {
+        return done(null, user);
+      } else {
+        return done(null, false);
+      }
     }
-    const match = await bcrypt.compare(password, user.password);
-    if (match) {
-      return done(null, user);
-    } else {
-      return done(null, false);
-    }
-  })
+  )
 );
 passport.serializeUser((user, done) => {
   const userType = req.params.userType;
