@@ -31,6 +31,8 @@ passport.use(
   )
 );
 passport.serializeUser((user, done) => {
+  console.log("Serializing user:", user);
+
   const userType = user.userType;
   const table = userType === "child" ? "guide" : "admin";
   done(null, user[`${table}id`]);
