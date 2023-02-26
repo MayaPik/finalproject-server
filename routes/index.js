@@ -16,24 +16,12 @@ router.post(
     next();
   },
   function (req, res, next) {
-    passport.authenticate("local", function (err, user, info) {
-      req.session.user = req.user;
-      if (err) {
-        return next(err);
-      }
-      if (!user) {
-        return res.redirect("/failure");
-      }
-      req.logIn(user, function (err) {
-        if (err) {
-          return next(err);
-        }
-        return res.redirect("/success");
-      });
-    })(req, res, next);
+    passport.authenticate("local", {
+      successRedirect: "/success",
+      failureRedirect: "/failure",
+    })(req, res, next, req);
   }
 );
-
 router.get("/success", (req, res) => {
   res.status(200).json({
     message: "Login successful",
