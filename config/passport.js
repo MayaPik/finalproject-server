@@ -15,15 +15,11 @@ const options = {
 
 passport.use(
   new LocalStrategy(options, async (username, password, userType, done) => {
-    const result = await knex(`${userType}`)
-      .select("*")
-      .where({ username })
-      .andWhereNot({ password })
-      .first();
-    if (result !== 1) {
+    const user = await knex(`${userType}`).where({ username }).first();
+    if (user !== 1) {
       return done(null, false);
     }
-    const match = await bcrypt.compare(password, result.password);
+    const match = await bcrypt.compare(password, user.password);
     if (match) {
       return done(null, user);
     } else {
