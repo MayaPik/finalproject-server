@@ -32,7 +32,7 @@ app.use((req, res, next) => {
 
   next();
 });
-app.use(cors({ origin: "*" }));
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(routes);
 
 app.listen(process.env.PORT);
