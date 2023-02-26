@@ -33,19 +33,19 @@ passport.use(
 
 passport.serializeUser((user, done) => {
   console.log("Serializing user:", user);
-  const userType = user.adminid
-    ? "adminid"
-    : user.childid
-    ? "childid"
-    : "guideid";
+  // const userType = user.adminid
+  //   ? "adminid"
+  //   : user.childid
+  //   ? "childid"
+  //   : "guideid";
 
-  done(null, user[userType]);
+  done(null, user.guideid);
 });
 
-passport.deserializeUser((id, done) => {
-  console.log("deserializeUser user:", id);
+passport.deserializeUser((guideid, done) => {
+  console.log("deserializeUser user:", guideid);
   knex("guide")
-    .where({ guideid: id })
+    .where({ guideid: guideid })
     // .union(function () {
     //   this.select("*").from("child").where({ childid: id });
     // })
