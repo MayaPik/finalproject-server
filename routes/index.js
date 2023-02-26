@@ -1,51 +1,23 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
+const router = require("express").Router();
+const passport = require("passport");
+const isAuth = require("./authMiddleware").isAuth;
+const isAdmin = require("./authMiddleware").isAdmin;
+const isGuide = require("./authMiddleware").isGuide;
+
 const knex = require("knex")({
   client: "pg",
   connection: process.env.DATABASE_URL,
 });
 
-const bcrypt = require("bcrypt");
-const app = express();
-
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(cors());
-
-app.set("db", knex);
-
-app.post(`/api/:userType/login`, async (req, res) => {
-  const userType = req.params.userType;
-  const { username, password } = req.body;
-  try {
-    const result = await knex(`${userType}`)
-      .select("*")
-      .where({ username })
-      .andWhereNot({ password });
-    if (result.length !== 1) {
-      return res.json({ error_message: "No username" });
-    }
-    const isMatch = await bcrypt.compare(password, result[0].password);
-    if (!isMatch) {
-      return res.json({ error_message: "Wrong username/password" });
-    } else {
-      const user = { ...result[0] };
-      delete user.password;
-      res.json({
-        message: "login successfully",
-        data: {
-          user,
-        },
-      });
-    }
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server error");
+router.post(
+  "/api/:userType/login",
+  passport.authenticate("local"),
+  (req, res) => {
+    res.json({ message: "login successful", user: req.user });
   }
-});
+);
 
-app.post(`/api/updateFixedTimes`, async (req, res) => {
+router.post(`/api/updateFixedTimes`, isAuth, async (req, res) => {
   const { childid, day, time } = req.body;
   try {
     const result = await knex("fixed").where({ childid, day });
@@ -61,7 +33,7 @@ app.post(`/api/updateFixedTimes`, async (req, res) => {
   }
 });
 
-app.post(`/api/updateOngoingTimes`, async (req, res) => {
+router.post(`/api/updateOngoingTimes`, isAuth, async (req, res) => {
   const { childid, day, time, date } = req.body;
   try {
     const result = await knex("ongoing").where({ childid, day, date });
@@ -76,7 +48,8 @@ app.post(`/api/updateOngoingTimes`, async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-app.get(`/api/getAllChildrenOfHour`, async (req, res) => {
+
+router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
   const day = req.query.day;
   const time = req.query.time;
   const guideid = req.query.guideid;
@@ -153,7 +126,7 @@ app.get(`/api/getAllChildrenOfHour`, async (req, res) => {
   }
 });
 
-app.get(`/api/getClassName`, async (req, res) => {
+router.get(`/api/getClassName`, isGuide, async (req, res) => {
   const classid = req.query.classid;
 
   try {
@@ -178,7 +151,7 @@ app.get(`/api/getClassName`, async (req, res) => {
   }
 });
 
-app.get(`/api/getAllChildren`, async (req, res) => {
+router.get(`/api/getAllChildren`, isAdmin, async (req, res) => {
   try {
     const query = knex
       .select(
@@ -211,4 +184,4 @@ app.get(`/api/getAllChildren`, async (req, res) => {
   }
 });
 
-app.listen(process.env.PORT);
+module.exports = router;
