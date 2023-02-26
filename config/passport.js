@@ -14,11 +14,12 @@ const options = {
 };
 
 passport.use(
-  new LocalStrategy(options, async (username, password, userType, done) => {
+  new LocalStrategy(options, async (username, password, done) => {
+    const { userType } = options;
     const user = await knex(`${userType}`)
       .where({ username: username })
       .first();
-    if (user !== 1) {
+    if (!user) {
       return done(null, false);
     }
     const match = await bcrypt.compare(password, user.password);
