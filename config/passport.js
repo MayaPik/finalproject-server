@@ -40,6 +40,7 @@ passport.serializeUser((user, done) => {
     : "guideid";
   const userData = {};
   userData[userType] = user;
+  console.log("Serializing user2:", userData);
 
   done(null, userData);
 });
@@ -60,6 +61,7 @@ passport.serializeUser((user, done) => {
 // });
 
 passport.deserializeUser((userData, done) => {
+  console.log("deserializeUser user:", userData);
   knex("admin")
     .where({ adminid: userData })
     .union(function () {
@@ -73,6 +75,8 @@ passport.deserializeUser((userData, done) => {
       if (!user) {
         return done(new Error("Invalid user id"));
       }
+      console.log("deserializeUser user2:", user);
+
       done(null, { user });
     })
     .catch((err) => done(err));
