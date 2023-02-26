@@ -8,7 +8,6 @@ const knex = require("knex")({
   client: "pg",
   connection: process.env.DATABASE_URL,
 });
-
 router.post(
   "/api/:userType/login",
   function (req, res, next) {
@@ -16,12 +15,23 @@ router.post(
     next();
   },
   function (req, res, next) {
-    passport.authenticate("local", {
-      successRedirect: "/success",
-      failureRedirect: "/failure",
-    })(req, res, next, req);
+    passport.authenticate("local", function (err, user, info) {
+      if (err) {
+        return next(err);
+      }
+      if (!user) {
+        return res.redirect("/failure");
+      }
+      req.logIn(user, function (err) {
+        if (err) {
+          return next(err);
+        }
+        return res.redirect("/success");
+      });
+    })(req, res, next);
   }
 );
+
 router.get("/success", (req, res) => {
   res.status(200).json({
     message: "Login successful",
