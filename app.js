@@ -20,9 +20,9 @@ app.use(
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
 require("./config/passport");
-
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -31,7 +31,6 @@ app.use((req, res, next) => {
   console.log(req.user);
   next();
 });
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(routes);
 
 app.listen(process.env.PORT);

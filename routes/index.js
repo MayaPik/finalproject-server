@@ -8,20 +8,18 @@ const knex = require("knex")({
   client: "pg",
   connection: process.env.DATABASE_URL,
 });
-
 router.post(
   "/api/:userType/login",
   function (req, res, next) {
     req.query.userType = req.params.userType;
     next();
   },
-  function (req, res, next) {
-    passport.authenticate("local", {
-      successRedirect: "/success",
-      failureRedirect: "/failure",
-    })(req, res, next, req);
-  }
+  passport.authenticate("local", {
+    successRedirect: "/success",
+    failureRedirect: "/failure",
+  })
 );
+
 router.get("/success", (req, res) => {
   res.status(200).json({
     message: "Login successful",
