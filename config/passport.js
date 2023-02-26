@@ -37,14 +37,18 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((guideid, done) => {
+  console.log("sttart");
   knex("guide")
-    .where({ guideid })
+    .where({ guideid: guideid })
     .first()
     .then((user) => {
       console.log(user);
       done(null, user);
     })
-    .catch((err) => done(err));
+    .catch((err) => {
+      console.log(err);
+      done(err);
+    });
 });
 
 // passport.serializeUser((user, done) => {
