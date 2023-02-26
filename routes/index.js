@@ -11,10 +11,10 @@ const knex = require("knex")({
 
 router.post(
   "/api/:userType/login",
-  function (req, res, next) {
-    req.query.userType = req.params.userType;
-    next();
-  },
+  //   function (req, res, next) {
+  //     req.query.userType = req.params.userType;
+  //     next();
+  //   },
   function (req, res, next) {
     passport.authenticate("local", {
       successRedirect: "/success",

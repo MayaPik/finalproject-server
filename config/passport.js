@@ -10,6 +10,7 @@ const knex = require("knex")({
 const options = {
   usernameField: "username",
   passwordField: "password",
+  passReqToCallback: true,
 };
 
 passport.use(
