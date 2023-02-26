@@ -32,36 +32,50 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  console.log("Serializing user:", user);
-  // const userType = user.adminid
-  //   ? "adminid"
-  //   : user.childid
-  //   ? "childid"
-  //   : "guideid";
-
   done(null, user.guideid);
 });
 
 passport.deserializeUser((guideid, done) => {
-  console.log("deserializeUser user:", guideid);
   knex("guide")
-    .where({ guideid: guideid })
-    // .union(function () {
-    //   this.select("*").from("child").where({ childid: id });
-    // })
-    // .union(function () {
-    //   this.select("*").from("guide").where({ guideid: id });
-    // })
+    .where({ guideid })
     .first()
     .then((user) => {
-      if (!user) {
-        return done(new Error("Invalid user id"));
-      }
-      console.log("deserializeUser user2:", user);
-
       done(null, user);
     })
     .catch((err) => done(err));
 });
+
+// passport.serializeUser((user, done) => {
+//   console.log("Serializing user:", user);
+//   const userType = user.adminid
+//     ? "adminid"
+//     : user.childid
+//     ? "childid"
+//     : "guideid";
+
+//   done(null, user[userType]);
+// });
+
+// passport.deserializeUser((id, done) => {
+//   console.log("deserializeUser user:", id);
+//   knex("admin")
+//     .where({ adminid: id })
+//     .union(function () {
+//       this.select("*").from("child").where({ childid: id });
+//     })
+//     .union(function () {
+//       this.select("*").from("guide").where({ guideid: id });
+//     })
+//     .first()
+//     .then((user) => {
+//       if (!user) {
+//         return done(new Error("Invalid user id"));
+//       }
+//       console.log("deserializeUser user2:", user);
+
+//       done(null, user);
+//     })
+//     .catch((err) => done(err));
+// });
 
 module.exports = passport;
