@@ -17,12 +17,15 @@ router.post(
   },
   function (req, res, next) {
     passport.authenticate("local", {
-      successRedirect: "/success",
-      failureRedirect: "/failure",
+      successRedirect: res.status(200).json({
+        message: "Login successful",
+        data: { user: req.user },
+      }),
+      failureRedirect: res.status(401).json({
+        message: "Login failed",
+        error_message: req.flash("error"),
+      }),
     })(req, res, next, req);
-  },
-  (req, res) => {
-    res.json({ message: "login successful", user: req.user });
   }
 );
 router.post(`/api/updateFixedTimes`, isAuth, async (req, res) => {
