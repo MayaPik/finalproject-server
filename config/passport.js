@@ -7,14 +7,14 @@ const knex = require("knex")({
   client: "pg",
   connection: process.env.DATABASE_URL,
 });
-
 const options = {
   usernameField: "username",
   passwordField: "password",
+  userTypeField: "userType", // new field for userType
 };
 
 passport.use(
-  new LocalStrategy(options, async (req, username, password, done) => {
+  new LocalStrategy(options, async (username, password, userType, done) => {
     const userType = req.params.userType;
     const result = await knex(`${userType}`)
       .select("*")
