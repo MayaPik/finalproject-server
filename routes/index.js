@@ -8,6 +8,7 @@ const knex = require("knex")({
   client: "pg",
   connection: process.env.DATABASE_URL,
 });
+
 router.post(
   "/api/:userType/login",
   (req, res, next) => {

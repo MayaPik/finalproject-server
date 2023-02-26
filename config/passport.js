@@ -15,7 +15,7 @@ const options = {
 
 passport.use(
   new LocalStrategy(options, async (username, password, done) => {
-    const { userType } = options;
+    const userType = options.userTypeField;
     const user = await knex(`${userType}`)
       .where({ username: username })
       .first();
@@ -30,7 +30,6 @@ passport.use(
     }
   })
 );
-
 passport.serializeUser((user, done) => {
   const userType = req.params.userType;
   const table = userType === "child" ? "guide" : "admin";
