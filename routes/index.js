@@ -22,7 +22,6 @@ router.post(
     })(req, res, next, req);
   }
 );
-
 router.get("/success", (req, res) => {
   res.status(200).json({
     message: "Login successful",

@@ -33,8 +33,15 @@ passport.use(
 
 passport.serializeUser((user, done) => {
   console.log("Serializing user:", user);
-  const userType = user.adminid ? "admin" : user.childid ? "child" : "guide";
-  done(null, user[`${userType}id`]);
+  const userType = user.adminid
+    ? "adminid"
+    : user.childid
+    ? "childid"
+    : "guideid";
+  const userData = {};
+  userData[userType] = user;
+
+  done(null, userData);
 });
 passport.deserializeUser((id, done) => {
   knex("admin")
