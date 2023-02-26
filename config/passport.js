@@ -43,28 +43,43 @@ passport.serializeUser((user, done) => {
 
   done(null, userData);
 });
-passport.deserializeUser((id, done) => {
-  knex("admin")
-    .where({ adminid: id })
-    .union(function () {
-      this.select("*").from("child").where({ childid: id });
-    })
-    .union(function () {
-      this.select("*").from("guide").where({ guideid: id });
-    })
+passport.deserializeUser((userData, done) => {
+  const userType = Object.keys(userData)[0];
+  const userId = userData[userType].id;
+  knex(userType)
+    .where({ id: userId })
     .first()
     .then((user) => {
       if (!user) {
         return done(new Error("Invalid user id"));
       }
-      const userType = user.adminid
-        ? "admin"
-        : user.childid
-        ? "child"
-        : "guide";
-      done(null, { ...user, userType });
+      done(null, user);
     })
     .catch((err) => done(err));
 });
+
+// passport.deserializeUser((id, done) => {
+//   knex("admin")
+//     .where({ adminid: id })
+//     .union(function () {
+//       this.select("*").from("child").where({ childid: id });
+//     })
+//     .union(function () {
+//       this.select("*").from("guide").where({ guideid: id });
+//     })
+//     .first()
+//     .then((user) => {
+//       if (!user) {
+//         return done(new Error("Invalid user id"));
+//       }
+//       const userType = user.adminid
+//         ? "admin"
+//         : user.childid
+//         ? "child"
+//         : "guide";
+//       done(null, { ...user, userType });
+//     })
+//     .catch((err) => done(err));
+// });
 
 module.exports = passport;
