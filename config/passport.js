@@ -15,7 +15,9 @@ const options = {
 
 passport.use(
   new LocalStrategy(options, async (username, password, userType, done) => {
-    const user = await knex(`${userType}`).where({ username }).first();
+    const user = await knex(`${userType}`)
+      .where({ username: username })
+      .first();
     if (user !== 1) {
       return done(null, false);
     }
