@@ -5,6 +5,7 @@ const session = require("express-session");
 const passport = require("passport");
 const routes = require("./routes");
 const app = express();
+app.use(cors({ origin: "*" }));
 
 app.use(
   session({
@@ -20,7 +21,6 @@ app.use(
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cors({ origin: "*" }));
 
 require("./config/passport");
 
