@@ -5,7 +5,6 @@ const session = require("express-session");
 const passport = require("passport");
 const routes = require("./routes");
 const app = express();
-app.use(cors({ origin: "*" }));
 
 app.use(
   session({
@@ -33,7 +32,7 @@ app.use((req, res, next) => {
 
   next();
 });
-
+app.use(cors({ origin: "*" }));
 app.use(routes);
 
 app.listen(process.env.PORT);
