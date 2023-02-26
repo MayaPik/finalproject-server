@@ -22,8 +22,7 @@ router.post(
         data: { user: req.user },
       }),
       failureRedirect: res.status(401).json({
-        message: "Login failed",
-        error_message: req.flash("error"),
+        error_message: "Login failed",
       }),
     })(req, res, next, req);
   }
