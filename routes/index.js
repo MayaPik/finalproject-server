@@ -11,18 +11,20 @@ const knex = require("knex")({
 
 router.post(
   "/api/:userType/login",
-  (req, res, next) => {
+  function (req, res, next) {
+    req.query.userType = req.params.userType;
+    next();
+  },
+  function (req, res, next) {
     passport.authenticate("local", {
       successRedirect: "/success",
       failureRedirect: "/failure",
-      userType: req.params.userType,
     })(req, res, next);
   },
   (req, res) => {
     res.json({ message: "login successful", user: req.user });
   }
 );
-
 router.post(`/api/updateFixedTimes`, isAuth, async (req, res) => {
   const { childid, day, time } = req.body;
   try {
