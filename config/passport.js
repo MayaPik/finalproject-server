@@ -10,11 +10,11 @@ const knex = require("knex")({
 const options = {
   usernameField: "username",
   passwordField: "password",
-  userTypeField: "userType",
 };
 
 passport.use(
-  new LocalStrategy(options, async (username, password, userType, done) => {
+  new LocalStrategy(options, async (req, username, password, done) => {
+    const userType = req.query.userType;
     const user = await knex(userType).where({ username: username }).first();
     if (!user) {
       return done(null, false);
