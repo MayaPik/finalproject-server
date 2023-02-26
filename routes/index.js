@@ -1,8 +1,8 @@
 const router = require("express").Router();
 const passport = require("passport");
-const isAuth = require("./authMiddleware").isAuth;
-const isAdmin = require("./authMiddleware").isAdmin;
-const isGuide = require("./authMiddleware").isGuide;
+const isAuth = require("./AuthMiddleware").isAuth;
+const isAdmin = require("./AuthMiddleware").isAdmin;
+const isGuide = require("./AuthMiddleware").isGuide;
 
 const knex = require("knex")({
   client: "pg",
