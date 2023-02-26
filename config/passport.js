@@ -38,21 +38,21 @@ passport.serializeUser((user, done) => {
     : user.childid
     ? "childid"
     : "guideid";
-  const userData = user[userType];
-  console.log("Serializing user2:", userData);
+  const id = user[userType];
+  console.log("Serializing user2:", id);
 
-  done(null, userData);
+  done(null, id);
 });
 
-passport.deserializeUser((userData, done) => {
-  console.log("deserializeUser user:", userData);
+passport.deserializeUser((id, done) => {
+  console.log("deserializeUser user:", id);
   knex("admin")
-    .where({ adminid: userData })
+    .where({ adminid: id })
     .union(function () {
-      this.select("*").from("child").where({ childid: userData });
+      this.select("*").from("child").where({ childid: id });
     })
     .union(function () {
-      this.select("*").from("guide").where({ guideid: userData });
+      this.select("*").from("guide").where({ guideid: id });
     })
     .first()
     .then((user) => {
