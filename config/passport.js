@@ -38,8 +38,8 @@ passport.serializeUser((user, done) => {
     : user.childid
     ? "childid"
     : "guideid";
-  user[userType];
-  console.log("Serializing user2:", user[userType]);
+  const userData = user[userType];
+  console.log("Serializing user2:", userData);
 
   done(null, userData);
 });
