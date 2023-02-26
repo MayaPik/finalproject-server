@@ -59,14 +59,14 @@ passport.serializeUser((user, done) => {
 //     .catch((err) => done(err));
 // });
 
-passport.deserializeUser((id, done) => {
+passport.deserializeUser((userData, done) => {
   knex("admin")
-    .where({ adminid: id })
+    .where({ adminid: userData })
     .union(function () {
-      this.select("*").from("child").where({ childid: id });
+      this.select("*").from("child").where({ childid: userData });
     })
     .union(function () {
-      this.select("*").from("guide").where({ guideid: id });
+      this.select("*").from("guide").where({ guideid: userData });
     })
     .first()
     .then((user) => {
