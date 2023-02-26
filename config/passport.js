@@ -44,21 +44,6 @@ passport.serializeUser((user, done) => {
   done(null, userData);
 });
 
-// passport.deserializeUser((userData, done) => {
-//   const userType = Object.keys(userData)[0];
-//   const userId = userData[userType].id;
-//   knex(userType)
-//     .where({ id: userId })
-//     .first()
-//     .then((user) => {
-//       if (!user) {
-//         return done(new Error("Invalid user id"));
-//       }
-//       done(null, user);
-//     })
-//     .catch((err) => done(err));
-// });
-
 passport.deserializeUser((userData, done) => {
   console.log("deserializeUser user:", userData);
   knex("admin")
@@ -76,7 +61,7 @@ passport.deserializeUser((userData, done) => {
       }
       console.log("deserializeUser user2:", user);
 
-      done(null, { user });
+      done(null, user);
     })
     .catch((err) => done(err));
 });
