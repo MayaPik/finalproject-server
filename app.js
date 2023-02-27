@@ -17,7 +17,7 @@ app.use(
     saveUninitialized: true,
     resave: true,
     cookie: {
-      domain: "incredible-sable-62c82c.netlify.app",
+      // domain: "incredible-sable-62c82c.netlify.app",
       maxAge: 30 * 24 * 60 * 60 * 1000,
       httpOnly: false,
       path: "/",
