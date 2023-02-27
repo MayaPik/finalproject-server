@@ -17,6 +17,7 @@ app.use(
     saveUninitialized: true,
     resave: true,
     cookie: {
+      domain: ".netlify.app",
       maxAge: 30 * 24 * 60 * 60 * 1000,
       sameSite: "none",
       secure: true,
