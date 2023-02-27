@@ -19,6 +19,8 @@ app.use(
     cookie: {
       // domain: "incredible-sable-62c82c.netlify.app",
       maxAge: 30 * 24 * 60 * 60 * 1000,
+      sameSite: "none",
+      secure: true,
       httpOnly: false,
       path: "/",
     },
