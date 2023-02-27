@@ -13,13 +13,13 @@ app.use(
     store: new (require("connect-pg-simple")(session))({
       conString: process.env.DATABASE_URL,
     }),
-    secret: "cat",
-    saveUninitialized: false,
-    resave: false,
+    secret: process.env.SECRET_KEY,
+    saveUninitialized: true,
+    resave: true,
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000,
       sameSite: "none",
-      secure: false,
+      secure: true,
     },
   })
 );
