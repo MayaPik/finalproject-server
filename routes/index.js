@@ -6,14 +6,26 @@ const isGuide = require("./AuthMiddleware").isGuide;
 //   client: "pg",
 //   connection: process.env.DATABASE_URL,
 // });
+
 const router = require("express").Router();
 const passport = require("passport");
+// router.post(
+//   "/api/guide/login",
+//   passport.authenticate("local", {
+//     failureRedirect: "/login-failure",
+//     successRedirect: "/login-success",
+//   })
+// );
+
 router.post(
   "/api/guide/login",
   passport.authenticate("local", {
     failureRedirect: "/login-failure",
     successRedirect: "/login-success",
-  })
+  }),
+  (req, res) => {
+    req.session.user = req.user;
+  }
 );
 
 router.get("/login-failure", (req, res) => {
