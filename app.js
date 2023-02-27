@@ -25,7 +25,6 @@ app.use(
     },
   })
 );
-
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 require("./config/passport");
