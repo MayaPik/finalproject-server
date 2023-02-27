@@ -31,7 +31,7 @@ require("./config/passport");
 
 app.use(
   cors({
-    origin: "https://incredible-sable-62c82c.netlify.app/",
+    origin: "https://incredible-sable-62c82c.netlify.app",
     credentials: true,
   })
 );
@@ -39,7 +39,7 @@ app.use(
 app.use(function (req, res, next) {
   res.header(
     "Access-Control-Allow-Origin",
-    "https://incredible-sable-62c82c.netlify.app/"
+    "https://incredible-sable-62c82c.netlify.app"
   );
   res.header(
     "Access-Control-Allow-Headers",
