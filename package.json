@@ -28,13 +28,5 @@
     "node": "v18.14.2"
   },
   "description": "",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/MayaPik/finalproject-server.git"
-  },
-  "bugs": {
-    "url": "https://github.com/MayaPik/finalproject-server/issues"
-  },
-  "homepage": "https://github.com/MayaPik/finalproject-serverside#readme",
   "devDependencies": {}
 }
