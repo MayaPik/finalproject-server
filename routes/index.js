@@ -10,29 +10,50 @@ const knex = require("knex")({
 });
 
 router.post(
-  "/api/:userType/login",
-  function (req, res, next) {
-    // req.query.userType = req.params.userType;
-    next();
-  },
+  "/login",
   passport.authenticate("local", {
-    successRedirect: "/success",
-    failureRedirect: "/failure",
+    failureRedirect: "/login-failure",
+    successRedirect: "/login-success",
   })
 );
 
-router.get("/success", (req, res) => {
+router.get("/login-failure", (req, res) => {
+  res.status(401).json({
+    message: "Login failed",
+  });
+});
+
+router.get("/login-success", (req, res) => {
   res.status(200).json({
     message: "Login successful",
     data: { user: req.user },
   });
 });
 
-router.get("/failure", (req, res) => {
-  res.status(401).json({
-    error_message: "Login failed",
-  });
-});
+// router.post(
+//   "/api/:userType/login",
+//   function (req, res, next) {
+//     req.query.userType = req.params.userType;
+//     next();
+//   },
+//   passport.authenticate("local", {
+//     successRedirect: "/success",
+//     failureRedirect: "/failure",
+//   })
+// );
+
+// router.get("/success", (req, res) => {
+//   res.status(200).json({
+//     message: "Login successful",
+//     data: { user: req.user },
+//   });
+// });
+
+// router.get("/failure", (req, res) => {
+//   res.status(401).json({
+//     error_message: "Login failed",
+//   });
+// });
 
 // router.post(`/api/updateFixedTimes`, isAuth, async (req, res) => {
 //   const { childid, day, time } = req.body;
