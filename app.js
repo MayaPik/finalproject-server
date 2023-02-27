@@ -12,17 +12,18 @@ app.use(
       conString: process.env.DATABASE_URL,
     }),
     secret: process.env.SECRET_KEY,
-    saveUninitialized: true,
+    saveUninitialized: false,
     resave: false,
-    cookie: { maxAge: 30 * 24 * 60 * 60 * 1000, secure: false },
+    cookie: { maxAge: 30 * 24 * 60 * 60 * 1000 },
   })
 );
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+require("./config/passport");
+
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
-require("./config/passport");
 app.use(passport.initialize());
 app.use(passport.session());
 

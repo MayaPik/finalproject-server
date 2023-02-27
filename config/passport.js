@@ -13,11 +13,11 @@ passport.use(
     {
       usernameField: "username",
       passwordField: "password",
-      passReqToCallback: true,
+      // passReqToCallback: true,
     },
     async (req, username, password, done) => {
-      const userType = req.query.userType;
-      const user = await knex(userType).where({ username: username }).first();
+      // const userType = req.query.userType;
+      const user = await knex("guide").where({ username: username }).first();
       if (!user) {
         return done(null, false);
       }
