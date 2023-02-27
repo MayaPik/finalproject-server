@@ -12,8 +12,8 @@ app.use(
       conString: process.env.DATABASE_URL,
     }),
     secret: process.env.SECRET_KEY,
-    saveUninitialized: false,
-    resave: false,
+    saveUninitialized: true,
+    resave: true,
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000,
       sameSite: "none",
