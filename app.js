@@ -52,7 +52,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use((req, res, next) => {
-  req["sessionCookies"].secure = true;
   console.log(req.session);
   console.log(req.user);
   next();
