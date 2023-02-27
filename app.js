@@ -11,9 +11,9 @@ app.use(
     store: new (require("connect-pg-simple")(session))({
       conString: process.env.DATABASE_URL,
     }),
-    secret: process.env.SECRET_KEY,
-    saveUninitialized: true,
-    resave: true,
+    secret: "cat",
+    saveUninitialized: false,
+    resave: false,
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000,
       sameSite: "none",
