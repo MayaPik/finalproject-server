@@ -5,6 +5,8 @@ const session = require("express-session");
 const passport = require("passport");
 const routes = require("./routes");
 const app = express();
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
 
 app.use(
   session({
