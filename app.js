@@ -29,10 +29,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 require("./config/passport");
 
-app.use(cors({ origin: "http://localhost:3001", credentials: true }));
+app.use(
+  cors({
+    origin: "https://incredible-sable-62c82c.netlify.app/",
+    credentials: true,
+  })
+);
 
 app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3001");
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://incredible-sable-62c82c.netlify.app/"
+  );
   res.header(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content-Type, Accept"
