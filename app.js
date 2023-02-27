@@ -17,7 +17,6 @@ app.use(
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000,
       sameSite: "none",
-      secure: false,
     },
   })
 );
@@ -26,7 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 require("./config/passport");
 
-// app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "http://localhost:3000");
