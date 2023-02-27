@@ -19,7 +19,6 @@ passport.use(
     if (!user) {
       return done(null, false);
     }
-
     const match = await bcrypt.compare(password, user.password);
     if (match) {
       return done(null, user);
