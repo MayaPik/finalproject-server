@@ -17,18 +17,12 @@ passport.use(
     },
     async (req, username, password, done) => {
       const userType = req.query.userType;
-      console.log(req.user);
-      console.log("userType:", userType);
-      console.log("username:", username);
-      console.log("password:", password);
       const user = await knex(userType).where({ username: username }).first();
       if (!user) {
         return done(null, false);
       }
       const match = await bcrypt.compare(password, user.password);
       if (match) {
-        console.log(user);
-
         return done(null, user);
       } else {
         return done(null, false);
