@@ -52,7 +52,6 @@ passport.use(
 // );
 
 passport.serializeUser((user, done) => {
-  console.log(user.guideid);
   done(null, user.guideid);
 });
 

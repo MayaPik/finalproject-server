@@ -22,18 +22,7 @@ router.post(
   passport.authenticate("local", {
     failureRedirect: "/login-failure",
     successRedirect: "/login-success",
-  }),
-  (req, res) => {
-    req.session.save(function (err) {
-      if (err) {
-        console.error(err);
-        console.log("Session is not save successfully!");
-      } else {
-        console.log("Set-Cookie header:", res.getHeader("Set-Cookie"));
-        res.json({ message: "Logged in successfully!" });
-      }
-    });
-  }
+  })
 );
 
 router.get("/login-failure", (req, res) => {
