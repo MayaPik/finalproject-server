@@ -79,13 +79,12 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser((user_id, done) => {
   console.log("deserializeUser user:", user_id);
   knex("admin")
-    .where({ user_id: user_id })
-    .union(function () {
-      this.select("*").from("child").where({ user_id: user_id });
-    })
-    .union(function () {
-      this.select("*").from("guide").where({ user_id: user_id });
-    })
+    .leftJoin("child", "admin.user_id", "child.user_id")
+    .leftJoin("guide", "admin.user_id", "guide.user_id")
+    .where("admin.user_id", user_id)
+    .orWhere("child.user_id", user_id)
+    .orWhere("guide.user_id", user_id)
+
     .first()
     .then((user) => {
       if (!user) {
