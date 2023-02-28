@@ -79,12 +79,12 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser((user_id, done) => {
   console.log("deserializeUser user:", user_id);
   knex("admin")
-    .where({ user_id: id })
+    .where({ user_id: user_id })
     .union(function () {
-      this.select("*").from("child").where({ user_id: id });
+      this.select("*").from("child").where({ user_id: user_id });
     })
     .union(function () {
-      this.select("*").from("guide").where({ user_id: id });
+      this.select("*").from("guide").where({ user_id: user_id });
     })
     .first()
     .then((user) => {
