@@ -21,10 +21,11 @@ router.post(
     failureRedirect: "/failure",
   })
 );
+
 router.get("/success", (req, res) => {
   const user = req.user;
-  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
-  res.cookie("user", user, { expires: expires });
+  const maxAge = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+  res.cookie("user", user, { maxAge: maxAge });
   res.status(200).json({
     message: "Login successful",
     data: { user: user },
