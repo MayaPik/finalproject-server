@@ -2,13 +2,14 @@ const isAuth = require("./AuthMiddleware").isAuth;
 const isAdmin = require("./AuthMiddleware").isAdmin;
 const isGuide = require("./AuthMiddleware").isGuide;
 
-// const knex = require("knex")({
-//   client: "pg",
-//   connection: process.env.DATABASE_URL,
-// });
+const knex = require("knex")({
+  client: "pg",
+  connection: process.env.DATABASE_URL,
+});
 
 const router = require("express").Router();
 const passport = require("passport");
+
 // router.post(
 //   "/api/guide/login",
 //   passport.authenticate("local", {
@@ -17,51 +18,43 @@ const passport = require("passport");
 //   })
 // );
 
-router.post(
-  "/api/guide/login",
-  passport.authenticate("local", {
-    failureRedirect: "/login-failure",
-    successRedirect: "/login-success",
-  })
-);
+// router.get("/login-failure", (req, res) => {
+//   res.status(401).json({
+//     message: "Login failed",
+//   });
+// });
 
-router.get("/login-failure", (req, res) => {
-  res.status(401).json({
-    message: "Login failed",
-  });
-});
-
-router.get("/login-success", (req, res) => {
-  res.status(200).json({
-    message: "Login successful",
-    data: { user: req.user },
-  });
-});
-
-// router.post(
-//   "/api/:userType/login",
-//   function (req, res, next) {
-//     req.query.userType = req.params.userType;
-//     next();
-//   },
-//   passport.authenticate("local", {
-//     successRedirect: "/success",
-//     failureRedirect: "/failure",
-//   })
-// );
-
-// router.get("/success", (req, res) => {
+// router.get("/login-success", (req, res) => {
 //   res.status(200).json({
 //     message: "Login successful",
 //     data: { user: req.user },
 //   });
 // });
 
-// router.get("/failure", (req, res) => {
-//   res.status(401).json({
-//     error_message: "Login failed",
-//   });
-// });
+router.post(
+  "/api/:userType/login",
+  function (req, res, next) {
+    req.query.userType = req.params.userType;
+    next();
+  },
+  passport.authenticate("local", {
+    successRedirect: "/success",
+    failureRedirect: "/failure",
+  })
+);
+
+router.get("/success", (req, res) => {
+  res.status(200).json({
+    message: "Login successful",
+    data: { user: req.user },
+  });
+});
+
+router.get("/failure", (req, res) => {
+  res.status(401).json({
+    error_message: "Login failed",
+  });
+});
 
 // router.post(`/api/updateFixedTimes`, isAuth, async (req, res) => {
 //   const { childid, day, time } = req.body;

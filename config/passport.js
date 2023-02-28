@@ -8,100 +8,100 @@ const knex = require("knex")({
   connection: process.env.DATABASE_URL,
 });
 
-const options = {
-  usernameField: "username",
-  passwordField: "password",
-};
-
-passport.use(
-  new LocalStrategy(options, async (username, password, done) => {
-    const user = await knex("guide").where({ username: username }).first();
-    if (!user) {
-      return done(null, false);
-    }
-
-    const match = await bcrypt.compare(password, user.password);
-    if (match) {
-      return done(null, user);
-    } else {
-      return done(null, false);
-    }
-  })
-);
+// const options = {
+//   usernameField: "username",
+//   passwordField: "password",
+// };
 
 // passport.use(
-//   new LocalStrategy(
-//     {
-//       usernameField: "username",
-//       passwordField: "password",
-//       passReqToCallback: true,
-//     },
-//     async (req, username, password, done) => {
-//       const userType = req.query.userType;
-//       const user = await knex(userType).where({ username: username }).first();
-//       if (!user) {
-//         return done(null, false);
-//       }
-//       const match = await bcrypt.compare(password, user.password);
-//       if (match) {
-//         return done(null, user);
-//       } else {
-//         return done(null, false);
-//       }
+//   new LocalStrategy(options, async (username, password, done) => {
+//     const user = await knex("guide").where({ username: username }).first();
+//     if (!user) {
+//       return done(null, false);
 //     }
-//   )
+
+//     const match = await bcrypt.compare(password, user.password);
+//     if (match) {
+//       return done(null, user);
+//     } else {
+//       return done(null, false);
+//     }
+//   })
 // );
 
-passport.serializeUser((user, done) => {
-  done(null, user.guideid);
-});
-
-passport.deserializeUser((guideid, done) => {
-  console.log("sttart");
-  knex("guide")
-    .where({ guideid: guideid })
-    .first()
-    .then((user) => {
-      console.log(user);
-      done(null, user);
-    })
-    .catch((err) => {
-      console.log(err);
-      done(err);
-    });
-});
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: "username",
+      passwordField: "password",
+      passReqToCallback: true,
+    },
+    async (req, username, password, done) => {
+      const userType = req.query.userType;
+      const user = await knex(userType).where({ username: username }).first();
+      if (!user) {
+        return done(null, false);
+      }
+      const match = await bcrypt.compare(password, user.password);
+      if (match) {
+        return done(null, user);
+      } else {
+        return done(null, false);
+      }
+    }
+  )
+);
 
 // passport.serializeUser((user, done) => {
-//   console.log("Serializing user:", user);
-//   const userType = user.adminid
-//     ? "adminid"
-//     : user.childid
-//     ? "childid"
-//     : "guideid";
-
-//   done(null, user[userType]);
+//   done(null, user.guideid);
 // });
 
-// passport.deserializeUser((id, done) => {
-//   console.log("deserializeUser user:", id);
-//   knex("admin")
-//     .where({ adminid: id })
-//     .union(function () {
-//       this.select("*").from("child").where({ childid: id });
-//     })
-//     .union(function () {
-//       this.select("*").from("guide").where({ guideid: id });
-//     })
+// passport.deserializeUser((guideid, done) => {
+//   console.log("sttart");
+//   knex("guide")
+//     .where({ guideid: guideid })
 //     .first()
 //     .then((user) => {
-//       if (!user) {
-//         return done(new Error("Invalid user id"));
-//       }
-//       console.log("deserializeUser user2:", user);
-
+//       console.log(user);
 //       done(null, user);
 //     })
-//     .catch((err) => done(err));
+//     .catch((err) => {
+//       console.log(err);
+//       done(err);
+//     });
 // });
+
+passport.serializeUser((user, done) => {
+  console.log("Serializing user:", user);
+  const userType = user.adminid
+    ? "adminid"
+    : user.childid
+    ? "childid"
+    : "guideid";
+
+  done(null, user[userType]);
+});
+
+passport.deserializeUser((id, done) => {
+  console.log("deserializeUser user:", id);
+  knex("admin")
+    .where({ adminid: id })
+    .union(function () {
+      this.select("*").from("child").where({ childid: id });
+    })
+    .union(function () {
+      this.select("*").from("guide").where({ guideid: id });
+    })
+    .first()
+    .then((user) => {
+      if (!user) {
+        return done(new Error("Invalid user id"));
+      }
+      console.log("deserializeUser user2:", user);
+
+      done(null, user);
+    })
+    .catch((err) => done(err));
+});
 
 module.exports = passport;
