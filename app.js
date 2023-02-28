@@ -27,7 +27,7 @@ require("./config/passport");
 
 app.use(
   cors({
-    origin: "http://welcome.pickinguptime.com/",
+    origin: "http://welcome.pickinguptime.com",
     credentials: true,
   })
 );
