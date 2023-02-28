@@ -25,7 +25,7 @@ app.use(
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(
-  cors({ origin: "http://www.welcome.pickinguptime.com", credentials: true })
+  cors({ origin: "http://welcome.pickinguptime.com", credentials: true })
 );
 
 require("./config/passport");
