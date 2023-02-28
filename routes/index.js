@@ -27,6 +27,7 @@ router.post(
     req.session.save(function (err) {
       if (err) {
         console.error(err);
+        console.log("Session is not save successfully!");
       } else {
         console.log("Set-Cookie header:", res.getHeader("Set-Cookie"));
         res.json({ message: "Logged in successfully!" });
