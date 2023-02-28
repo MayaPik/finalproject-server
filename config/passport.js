@@ -75,28 +75,19 @@ passport.serializeUser((user, done) => {
   console.log("Serializing user:", user);
   done(null, user.user_id);
 });
-
 passport.deserializeUser((user_id, done) => {
   console.log("deserializeUser user:", user_id);
-  knex("admin")
-    .leftJoin("child", "admin.user_id", "child.user_id")
-    .leftJoin("guide", "admin.user_id", "guide.user_id")
-    .where("admin.user_id", user_id)
-    .orWhere("child.user_id", user_id)
-    .orWhere("guide.user_id", user_id)
-    .select(
-      "admin.user_id as user_id",
-      "admin.username as username",
-      "child.user_id as child_user_id",
-      "guide.user_id as guide_user_id"
-    )
-    .first()
-    .then((user) => {
+  Promise.all([
+    knex("admin").where({ user_id: user_id }).select(),
+    knex("child").where({ user_id: user_id }).select(),
+    knex("guide").where({ user_id: user_id }).select(),
+  ])
+    .then((results) => {
+      const user = results.reduce((acc, val) => acc.concat(val), [])[0];
       if (!user) {
         return done(new Error("Invalid user id"));
       }
       console.log("deserializeUser user2:", user);
-
       done(null, user);
     })
     .catch((err) => done(err));
