@@ -16,8 +16,8 @@ app.use(
     resave: false,
     cookie: {
       sameSite: "none",
-      secure: false,
-      domain: ".pickinguptime.com",
+      // secure: false,
+      // domain: ".pickinguptime.com",
       maxAge: 30 * 24 * 60 * 60 * 1000,
     },
   })
@@ -29,7 +29,10 @@ require("./config/passport");
 
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Credentials", true);
-  res.header("Access-Control-Allow-Origin", req.headers.origin);
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://www.welcome.pickinguptime.com"
+  );
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
   res.header(
     "Access-Control-Allow-Headers",
@@ -43,19 +46,6 @@ app.use(function (req, res, next) {
 //     credentials: true,
 //   })
 // );
-
-// app.use(function (req, res, next) {
-//   res.header(
-//     "Access-Control-Allow-Origin",
-//     "https://front-final-project.herokuapp.com"
-//   );
-//   res.header(
-//     "Access-Control-Allow-Headers",
-//     "Origin, X-Requested-With, Content-Type, Accept"
-//   );
-//   res.header("Access-Control-Allow-Credentials", true);
-//   next();
-// });
 
 app.use(passport.initialize());
 app.use(passport.session());
