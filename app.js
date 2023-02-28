@@ -15,7 +15,7 @@ app.use(
     saveUninitialized: false,
     resave: false,
     cookie: {
-      sameSite: "none",
+      // sameSite: "none",
       // secure: false,
       // domain: ".pickinguptime.com",
       maxAge: 30 * 24 * 60 * 60 * 1000,
@@ -24,6 +24,9 @@ app.use(
 );
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(
+  cors({ origin: "http://www.welcome.pickinguptime.com", credentials: true })
+);
 
 require("./config/passport");
 
