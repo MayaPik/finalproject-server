@@ -84,7 +84,12 @@ passport.deserializeUser((user_id, done) => {
     .where("admin.user_id", user_id)
     .orWhere("child.user_id", user_id)
     .orWhere("guide.user_id", user_id)
-
+    .select(
+      "admin.user_id as user_id",
+      "admin.username as username",
+      "child.user_id as child_user_id",
+      "guide.user_id as guide_user_id"
+    )
     .first()
     .then((user) => {
       if (!user) {
