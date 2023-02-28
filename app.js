@@ -15,7 +15,7 @@ app.use(
     saveUninitialized: false,
     resave: false,
     cookie: {
-      sameSite: "strict",
+      sameSite: "none",
       domain: ".pickinguptime.com",
       maxAge: 30 * 24 * 60 * 60 * 1000,
     },
