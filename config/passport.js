@@ -73,24 +73,18 @@ passport.use(
 
 passport.serializeUser((user, done) => {
   console.log("Serializing user:", user);
-  const userType = user.adminid
-    ? "adminid"
-    : user.childid
-    ? "childid"
-    : "guideid";
-
-  done(null, user[userType]);
+  done(null, user.user_id);
 });
 
-passport.deserializeUser((id, done) => {
-  console.log("deserializeUser user:", id);
+passport.deserializeUser((user_id, done) => {
+  console.log("deserializeUser user:", user_id);
   knex("admin")
-    .where({ adminid: id })
+    .where({ user_id: id })
     .union(function () {
-      this.select("*").from("child").where({ childid: id });
+      this.select("*").from("child").where({ user_id: id });
     })
     .union(function () {
-      this.select("*").from("guide").where({ guideid: id });
+      this.select("*").from("guide").where({ user_id: id });
     })
     .first()
     .then((user) => {
