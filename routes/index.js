@@ -24,7 +24,14 @@ router.post(
     successRedirect: "/login-success",
   }),
   (req, res) => {
-    req.session.user = req.user;
+    req.session.save(function (err) {
+      if (err) {
+        console.error(err);
+      } else {
+        console.log("Set-Cookie header:", res.getHeader("Set-Cookie"));
+        res.json({ message: "Logged in successfully!" });
+      }
+    });
   }
 );
 
