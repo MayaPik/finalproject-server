@@ -41,12 +41,12 @@ require("./config/passport");
 //   next();
 // });
 
-app.use(
-  cors({
-    origin: "http://welcome.pickinguptime.com",
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: "http://welcome.pickinguptime.com",
+//     credentials: true,
+//   })
+// );
 
 app.use(passport.initialize());
 app.use(passport.session());
