@@ -72,11 +72,9 @@ passport.use(
 // });
 
 passport.serializeUser((user, done) => {
-  console.log("Serializing user:", user);
   done(null, user.user_id);
 });
 passport.deserializeUser((user_id, done) => {
-  console.log("deserializeUser user:", user_id);
   Promise.all([
     knex("admin").where({ user_id: user_id }).select(),
     knex("child").where({ user_id: user_id }).select(),
