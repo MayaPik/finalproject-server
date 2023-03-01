@@ -32,28 +32,23 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  console.log(user.user_id);
   done(null, user.user_id);
 });
-passport.deserializeUser((id, done) => {
-  console.log("2" + id);
+passport.deserializeUser((user_id, done) => {
   Promise.all([
-    knex("admin").where({ user_id: id }).select(),
-    knex("child").where({ user_id: id }).select(),
-    knex("guide").where({ user_id: id }).select(),
+    knex("admin").where({ user_id: user_id }).select(),
+    knex("child").where({ user_id: user_id }).select(),
+    knex("guide").where({ user_id: user_id }).select(),
   ])
-    .then(([admin, child, guide]) => {
-      const user = admin[0] || child[0] || guide[0];
+    .then((results) => {
+      const user = results.reduce((acc, val) => acc.concat(val), [])[0];
       if (!user) {
-        console.log("deserializeUser user:", error);
-        return done(null, false);
+        return done(new Error("Invalid user id"));
       }
-      console.log("deserializeUser user:", user);
+      console.log("deserializeUser user2:", user);
       done(null, user);
     })
-    .catch((err) => {
-      done(err);
-    });
+    .catch((err) => done(err));
 });
 
 module.exports = passport;
