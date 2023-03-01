@@ -15,11 +15,15 @@ app.use(
     saveUninitialized: false,
     resave: false,
     cookie: {
+      httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000,
       secure: true,
+      domain: ".pickinguptime.com",
+      sameSite: "none",
     },
   })
 );
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
