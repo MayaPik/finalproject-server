@@ -76,18 +76,24 @@ passport.serializeUser((user, done) => {
   done(null, user.user_id);
 });
 passport.deserializeUser((user_id, done) => {
-  console.log(user_id);
+  console.log("2" + user_id);
   Promise.all([
     knex("admin").where({ user_id: user_id }).select(),
     knex("child").where({ user_id: user_id }).select(),
     knex("guide").where({ user_id: user_id }).select(),
   ])
     .then((results) => {
-      const user = results.reduce((acc, val) => acc.concat(val), [])[0];
+      let user;
+      for (const result of results) {
+        if (result.length > 0) {
+          user = result[0];
+          break;
+        }
+      }
       if (!user) {
         return done(new Error("Invalid user id"));
       }
-      console.log("deserializeUser user2:", user);
+      console.log("deserializeUser user:", user);
       done(null, user);
     })
     .catch((err) => done(err));
