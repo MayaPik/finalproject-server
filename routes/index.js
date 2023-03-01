@@ -35,6 +35,19 @@ router.get("/failure", (req, res) => {
   });
 });
 
+app.post("/api/logout", (req, res) => {
+  req.session.destroy();
+  res.sendStatus(200);
+});
+
+app.get("/api/user", (req, res) => {
+  if (req.session.user) {
+    res.json(req.session.user);
+  } else {
+    res.sendStatus(401);
+  }
+});
+
 router.post(`/api/updateFixedTimes`, async (req, res) => {
   const { childid, day, time } = req.body;
   try {
