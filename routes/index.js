@@ -2,10 +2,10 @@
 // const isAdmin = require("./AuthMiddleware").isAdmin;
 // const isGuide = require("./AuthMiddleware").isGuide;
 
-// const knex = require("knex")({
-//   client: "pg",
-//   connection: process.env.DATABASE_URL,
-// });
+const knex = require("knex")({
+  client: "pg",
+  connection: process.env.DATABASE_URL,
+});
 
 const router = require("express").Router();
 const passport = require("passport");

@@ -5,6 +5,7 @@ const session = require("express-session");
 const passport = require("passport");
 const routes = require("./routes");
 const app = express();
+
 app.set("trust proxy", 1);
 
 app.use(
@@ -20,6 +21,7 @@ app.use(
       secure: true,
       domain: ".pickinguptime.com",
     },
+    proxy: true,
   })
 );
 
