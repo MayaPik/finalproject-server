@@ -13,7 +13,7 @@ app.use(
   cors({ origin: "https://welcome.pickinguptime.com", credentials: true })
 );
 
-app.use(cookieParser(process.env.SECRET_KEY));
+// app.use(cookieParser(process.env.SECRET_KEY));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -27,9 +27,8 @@ app.use(
     saveUninitialized: true,
     resave: false,
     cookie: {
-      // httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000,
-      // secure: true,
+      secure: true,
       domain: ".pickinguptime.com",
     },
   })
