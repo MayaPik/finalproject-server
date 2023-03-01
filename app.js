@@ -13,7 +13,7 @@ app.set("trust proxy", 1);
 //   cors({ origin: "https://welcome.pickinguptime.com", credentials: true })
 // );
 
-service.use(function (req, res, next) {
+app.use(function (req, res, next) {
   res.header(
     "Access-Control-Allow-Origin",
     "https://welcome.pickinguptime.com"
