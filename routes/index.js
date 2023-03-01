@@ -19,7 +19,6 @@ router.post(
   passport.authenticate("local", {
     successRedirect: "/success",
     failureRedirect: "/failure",
-    session: true,
   })
 );
 
