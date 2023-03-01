@@ -9,9 +9,9 @@ const cookieParser = require("cookie-parser");
 const app = express();
 app.set("trust proxy", 1);
 
-// app.use(
-//   cors({ origin: "https://welcome.pickinguptime.com", credentials: true })
-// );
+app.use(
+  cors({ origin: "https://welcome.pickinguptime.com", credentials: true })
+);
 
 app.use(function (req, res, next) {
   res.header(
