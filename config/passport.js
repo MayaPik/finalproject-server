@@ -52,48 +52,48 @@ passport.use(
   )
 );
 
-// passport.serializeUser((user, done) => {
-//   done(null, user.guideid);
-// });
-
-// passport.deserializeUser((guideid, done) => {
-//   console.log("sttart");
-//   knex("guide")
-//     .where({ guideid: guideid })
-//     .first()
-//     .then((user) => {
-//       console.log(user);
-//       done(null, user);
-//     })
-//     .catch((err) => {
-//       console.log(err);
-//       done(err);
-//     });
-// });
-
 passport.serializeUser((user, done) => {
-  console.log(user.user_id);
-  done(null, user.user_id);
+  done(null, user.guideid);
 });
-passport.deserializeUser((id, done) => {
-  console.log("2" + id);
-  Promise.all([
-    knex("admin").where({ user_id: id }).select(),
-    knex("child").where({ user_id: id }).select(),
-    knex("guide").where({ user_id: id }).select(),
-  ])
-    .then(([admin, child, guide]) => {
-      const user = admin[0] || child[0] || guide[0];
-      if (!user) {
-        console.log("deserializeUser user:", error);
-        return done(null, false);
-      }
-      console.log("deserializeUser user:", user);
+
+passport.deserializeUser((guideid, done) => {
+  console.log("sttart");
+  knex("guide")
+    .where({ guideid: guideid })
+    .first()
+    .then((user) => {
+      console.log(user);
       done(null, user);
     })
     .catch((err) => {
+      console.log(err);
       done(err);
     });
 });
+
+// passport.serializeUser((user, done) => {
+//   console.log(user.user_id);
+//   done(null, user.user_id);
+// });
+// passport.deserializeUser((id, done) => {
+//   console.log("2" + id);
+//   Promise.all([
+//     knex("admin").where({ user_id: id }).select(),
+//     knex("child").where({ user_id: id }).select(),
+//     knex("guide").where({ user_id: id }).select(),
+//   ])
+//     .then(([admin, child, guide]) => {
+//       const user = admin[0] || child[0] || guide[0];
+//       if (!user) {
+//         console.log("deserializeUser user:", error);
+//         return done(null, false);
+//       }
+//       console.log("deserializeUser user:", user);
+//       done(null, user);
+//     })
+//     .catch((err) => {
+//       done(err);
+//     });
+// });
 
 module.exports = passport;
