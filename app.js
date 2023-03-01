@@ -12,12 +12,10 @@ app.use(
       conString: process.env.DATABASE_URL,
     }),
     secret: process.env.SECRET_KEY,
-    saveUninitialized: true,
+    saveUninitialized: false,
     resave: true,
-    proxy: true, // add this line
     cookie: {
       maxAge: 30 * 24 * 60 * 60 * 1000,
-      secure: true,
     },
   })
 );
