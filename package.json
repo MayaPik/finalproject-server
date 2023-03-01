@@ -29,5 +29,6 @@
   "engines": {
     "node": "v18.14.2"
   },
-  "description": ""
+  "description": "",
+  "devDependencies": {}
 }

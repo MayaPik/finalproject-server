@@ -4,9 +4,10 @@ const cors = require("cors");
 const session = require("express-session");
 const passport = require("passport");
 const routes = require("./routes");
+const cookieParser = require("cookie-parser");
+
 const app = express();
 app.set("trust proxy", 1);
-app.use(cookieParser());
 
 app.use(
   session({
@@ -31,6 +32,7 @@ app.use(express.json());
 app.use(
   cors({ origin: "https://welcome.pickinguptime.com", credentials: true })
 );
+app.use(cookieParser());
 
 require("./config/passport");
 
