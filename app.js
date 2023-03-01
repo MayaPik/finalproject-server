@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const session = require("express-session");
-
+const cookieSession = require("cookie-session");
 const passport = require("passport");
 const routes = require("./routes");
 const cookieParser = require("cookie-parser");
@@ -33,6 +33,8 @@ app.use(cookieParser(process.env.SECRET_KEY));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+app.use(cookieSession({ secret: process.env.SECRET_KEY }));
 
 app.use(
   session({
