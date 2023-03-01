@@ -9,7 +9,6 @@ const knex = require("knex")({
 
 const router = require("express").Router();
 const passport = require("passport");
-
 router.post(
   "/api/:userType/login",
   function (req, res, next) {
@@ -34,7 +33,6 @@ router.get("/failure", (req, res) => {
     error_message: "Login failed",
   });
 });
-
 // router.post("/api/logout", (req, res) => {
 //   req.session.destroy();
 //   res.sendStatus(200);

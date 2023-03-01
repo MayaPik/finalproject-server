@@ -12,8 +12,10 @@ app.set("trust proxy", 1);
 app.use(
   cors({ origin: "https://welcome.pickinguptime.com", credentials: true })
 );
+
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+
 app.use(express.json());
 app.use(
   session({
@@ -21,7 +23,7 @@ app.use(
       conString: process.env.DATABASE_URL,
     }),
     secret: process.env.SECRET_KEY,
-    saveUninitialized: false,
+    saveUninitialized: true,
     resave: false,
     cookie: {
       httpOnly: true,
@@ -32,10 +34,10 @@ app.use(
   })
 );
 
-require("./config/passport");
+const passport = require("./config/passport");
+
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(routes);
 
 app.use((req, res, next) => {
   console.log(req.session);
@@ -43,13 +45,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-
-// error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send("Something went wrong!");
-});
+app.use(routes);
 
 app.listen(process.env.PORT);
