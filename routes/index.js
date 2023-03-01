@@ -8,6 +8,7 @@ const knex = require("knex")({
 });
 
 const router = require("express").Router();
+const { cookie } = require("express-validator");
 const passport = require("passport");
 
 router.post(
@@ -41,6 +42,10 @@ router.post("/api/logout", (req, res) => {
 });
 
 router.get("/api/user", (req, res) => {
+  console.log(req.session.user + "reqsessionuser");
+  console.log(req.session + "reqsession");
+  console.log(req.user + "requser");
+  console.log(req.session.cookie + "cookie");
   if (req.session.user) {
     res.json(req.session.user);
   } else {
