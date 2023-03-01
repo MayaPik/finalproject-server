@@ -70,29 +70,30 @@ passport.use(
 //       done(err);
 //     });
 // });
+
 passport.serializeUser((user, done) => {
   console.log(user.user_id);
   done(null, user.user_id);
 });
-
-passport.deserializeUser(async (id, done) => {
+passport.deserializeUser((id, done) => {
   console.log("2" + id);
-  try {
-    const [admin, child, guide] = await Promise.all([
-      knex("admin").where({ user_id: id }).select(),
-      knex("child").where({ user_id: id }).select(),
-      knex("guide").where({ user_id: id }).select(),
-    ]);
-    const user = admin[0] || child[0] || guide[0];
-    if (!user) {
-      console.log("deserializeUser user:", error);
-
-      return done(null, false);
-    }
-    console.log("deserializeUser user:", user);
-    done(null, user);
-  } catch (err) {
-    done(err);
-  }
+  Promise.all([
+    knex("admin").where({ user_id: id }).select(),
+    knex("child").where({ user_id: id }).select(),
+    knex("guide").where({ user_id: id }).select(),
+  ])
+    .then(([admin, child, guide]) => {
+      const user = admin[0] || child[0] || guide[0];
+      if (!user) {
+        console.log("deserializeUser user:", error);
+        return done(null, false);
+      }
+      console.log("deserializeUser user:", user);
+      done(null, user);
+    })
+    .catch((err) => {
+      done(err);
+    });
 });
+
 module.exports = passport;
