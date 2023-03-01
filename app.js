@@ -28,10 +28,11 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser(process.env.SECRET_KEY));
 
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
 app.use(
   session({
     store: new (require("connect-pg-simple")(session))({
