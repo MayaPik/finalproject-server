@@ -34,7 +34,7 @@ app.use(
   })
 );
 
-const passport = require("./config/passport");
+require("./config/passport");
 
 app.use(passport.initialize());
 app.use(passport.session());
