@@ -10,6 +10,12 @@ const app = express();
 app.set("trust proxy", 1);
 
 app.use(
+  cors({ origin: "https://welcome.pickinguptime.com", credentials: true })
+);
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(
   session({
     store: new (require("connect-pg-simple")(session))({
       conString: process.env.DATABASE_URL,
@@ -26,25 +32,24 @@ app.use(
   })
 );
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-
-app.use(
-  cors({ origin: "https://welcome.pickinguptime.com", credentials: true })
-);
-app.use(cookieParser());
-
 require("./config/passport");
-
 app.use(passport.initialize());
 app.use(passport.session());
-
 app.use(routes);
 
 app.use((req, res, next) => {
   console.log(req.session);
   console.log(req.user);
   next();
+});
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+// error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send("Something went wrong!");
 });
 
 app.listen(process.env.PORT);
