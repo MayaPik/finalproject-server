@@ -60,7 +60,7 @@ router.post("/api/logout", (req, res) => {
   req.logout();
   res.sendStatus(200);
 });
-const deserializeUser = require("./config/passport");
+const deserializeUser = require("../config/passport");
 
 router.get("/api/user", (req, res) => {
   if (req.session.passport && req.session.passport.user) {
