@@ -62,24 +62,21 @@ router.post("/api/logout", (req, res) => {
 });
 
 router.get("/api/user", (req, res) => {
-  req.session.reload((err) => {
-    if (err) {
-      console.error(err);
-      return res.sendStatus(401);
-    }
-    if (req.session.passport) {
-      deserializeUser(req.session.passport.user, (err, user) => {
-        if (err) {
-          console.error(err);
-          return res.sendStatus(401);
-        }
-        res.json(user);
-      });
-    } else {
-      console.log("401");
-      res.sendStatus(401);
-    }
-  });
+  setTimeout(() => {
+    console.log(req.session.passport.user);
+  }, 2000); // 2 second delay
+  if (req.session.passport && req.session.passport.user) {
+    deserializeUser(req.session.passport.user, (err, user) => {
+      if (err) {
+        console.log(err);
+        return res.sendStatus(401);
+      }
+      res.json(user);
+    });
+  } else {
+    console.log("401");
+    res.sendStatus(401);
+  }
 });
 
 router.post(`/api/updateFixedTimes`, isAuth, async (req, res) => {
