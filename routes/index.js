@@ -20,13 +20,19 @@ router.post(
     failureRedirect: "/failure",
   }),
   function (req, res) {
+    // Store user object in session
     req.login(req.user, function (err) {
       if (err) {
         return next(err);
       }
       res.status(200).json({
         message: "Login successful",
-        data: { session: req.session, user: req.user, req: req.session.user },
+        data: {
+          session: req.session,
+          user: req.user,
+          req: req.session.user,
+          user_id: req.session.passport.user,
+        },
       });
     });
   }
@@ -35,7 +41,12 @@ router.post(
 router.get("/success", (req, res) => {
   res.status(200).json({
     message: "Login successful",
-    data: { session: req.session, user: req.user, req: req.session.user },
+    data: {
+      session: req.session,
+      user: req.user,
+      req: req.session.user,
+      user_id: req.session.passport.user,
+    },
   });
 });
 
@@ -45,18 +56,18 @@ router.get("/failure", (req, res) => {
   });
 });
 
-// router.post("/api/logout", (req, res) => {
-//   req.session.destroy();
-//   res.sendStatus(200);
-// });
+router.post("/api/logout", (req, res) => {
+  req.session.destroy();
+  res.sendStatus(200);
+});
 
-// router.get("/api/user", (req, res) => {
-//   if (req.session.user) {
-//     res.json(req.session.user);
-//   } else {
-//     res.sendStatus(401);
-//   }
-// });
+router.get("/api/user", (req, res) => {
+  if (req.session.passport.user) {
+    res.json(req.session.passport.user);
+  } else {
+    res.sendStatus(401);
+  }
+});
 
 router.post(`/api/updateFixedTimes`, isAuth, async (req, res) => {
   const { childid, day, time } = req.body;
