@@ -57,14 +57,16 @@ router.get("/failure", (req, res) => {
 });
 
 router.post("/api/logout", (req, res) => {
-  req.logout();
-  res.sendStatus(200);
+  req.logout((err) => {
+    if (err) {
+      console.log(err);
+      return res.sendStatus(500);
+    }
+    res.sendStatus(200);
+  });
 });
 
 router.get("/api/user", (req, res) => {
-  setTimeout(() => {
-    console.log(req.session.passport.user);
-  }, 2000); // 2 second delay
   if (req.session.passport && req.session.passport.user) {
     deserializeUser(req.session.passport.user, (err, user) => {
       if (err) {
