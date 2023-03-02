@@ -1,6 +1,8 @@
 const isAuth = require("./AuthMiddleware").isAuth;
 const isAdmin = require("./AuthMiddleware").isAdmin;
 const isGuide = require("./AuthMiddleware").isGuide;
+const cookieParser = require("cookie-parser");
+const decodeConnectCidCookie = require("./decodeConnectCidCookie");
 
 const knex = require("knex")({
   client: "pg",
@@ -61,7 +63,7 @@ router.post("/api/logout", (req, res) => {
   res.sendStatus(200);
 });
 
-router.get("/api/user", (req, res) => {
+router.get("/api/user", cookieParser(), decodeConnectCidCookie, (req, res) => {
   if (req.user) {
     res.json(req.user);
   } else {
