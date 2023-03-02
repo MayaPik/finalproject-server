@@ -37,6 +37,8 @@ require("./config/passport");
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(passport.deserializeUser());
+
 app.use(routes);
 
 app.use((req, res, next) => {

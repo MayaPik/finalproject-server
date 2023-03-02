@@ -1,8 +1,6 @@
 const isAuth = require("./AuthMiddleware").isAuth;
 const isAdmin = require("./AuthMiddleware").isAdmin;
 const isGuide = require("./AuthMiddleware").isGuide;
-// const cookieParser = require("cookie-parser");
-// const decodeConnectCidCookie = require("./decodeConnectCidCookie");
 
 const knex = require("knex")({
   client: "pg",
@@ -62,12 +60,16 @@ router.post("/api/logout", (req, res) => {
   req.logout();
   res.sendStatus(200);
 });
+const deserializeUser = require("./config/passport");
 
-app.use(deserializeUser);
-
-app.get("/api/user", (req, res) => {
+router.get("/api/user", (req, res) => {
   if (req.session.passport && req.session.passport.user) {
-    res.json(req.session.passport.user);
+    deserializeUser(req.session.passport.user, (err, user) => {
+      if (err) {
+        return res.sendStatus(401);
+      }
+      res.json(user);
+    });
   } else {
     res.sendStatus(401);
   }
