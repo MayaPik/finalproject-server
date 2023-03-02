@@ -33,6 +33,13 @@ router.post(
   }
 );
 
+router.get("/success", (req, res) => {
+  res.status(200).json({
+    message: "Login successful",
+    data: { user: req.user },
+  });
+});
+
 router.get("/failure", (req, res) => {
   res.status(401).json({
     error_message: "Login failed",
