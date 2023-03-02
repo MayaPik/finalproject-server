@@ -21,7 +21,6 @@ router.post(
     failureRedirect: "/failure",
   }),
   function (req, res) {
-    // Store user object in session
     req.login(req.user, function (err) {
       if (err) {
         return next(err);
@@ -66,11 +65,13 @@ router.get("/api/user", (req, res) => {
   if (req.session.passport && req.session.passport.user) {
     deserializeUser(req.session.passport.user, (err, user) => {
       if (err) {
+        console.log(err);
         return res.sendStatus(401);
       }
       res.json(user);
     });
   } else {
+    console.log("401");
     res.sendStatus(401);
   }
 });

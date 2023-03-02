@@ -34,6 +34,7 @@ passport.use(
 passport.serializeUser((user, done) => {
   done(null, user.user_id);
 });
+
 passport.deserializeUser((user_id, done) => {
   Promise.all([
     knex("admin").where({ user_id: user_id }).select(),
