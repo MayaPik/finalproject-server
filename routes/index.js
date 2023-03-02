@@ -57,13 +57,13 @@ router.get("/failure", (req, res) => {
 });
 
 router.post("/api/logout", (req, res) => {
-  req.session.destroy();
+  req.logout();
   res.sendStatus(200);
 });
 
 router.get("/api/user", (req, res) => {
-  if (req.session.passport.user) {
-    res.json(req.session.passport.user);
+  if (req.user) {
+    res.json(req.user);
   } else {
     res.sendStatus(401);
   }
