@@ -59,7 +59,7 @@ router.get("/failure", (req, res) => {
 //   }
 // });
 
-router.post(`/api/updateFixedTimes`, async (req, res) => {
+router.post(`/api/updateFixedTimes`, isAuth, async (req, res) => {
   const { childid, day, time } = req.body;
   try {
     const result = await knex("fixed").where({ childid, day });
@@ -75,7 +75,7 @@ router.post(`/api/updateFixedTimes`, async (req, res) => {
   }
 });
 
-router.post(`/api/updateOngoingTimes`, async (req, res) => {
+router.post(`/api/updateOngoingTimes`, isAuth, async (req, res) => {
   const { childid, day, time, date } = req.body;
   try {
     const result = await knex("ongoing").where({ childid, day, date });
@@ -91,7 +91,7 @@ router.post(`/api/updateOngoingTimes`, async (req, res) => {
   }
 });
 
-router.get(`/api/getAllChildrenOfHour`, async (req, res) => {
+router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
   const day = req.query.day;
   const time = req.query.time;
   const guideid = req.query.guideid;
@@ -168,7 +168,7 @@ router.get(`/api/getAllChildrenOfHour`, async (req, res) => {
   }
 });
 
-router.get(`/api/getClassName`, async (req, res) => {
+router.get(`/api/getClassName`, isGuide, async (req, res) => {
   const classid = req.query.classid;
 
   try {
@@ -193,7 +193,7 @@ router.get(`/api/getClassName`, async (req, res) => {
   }
 });
 
-router.get(`/api/getAllChildren`, async (req, res) => {
+router.get(`/api/getAllChildren`, isAdmin, async (req, res) => {
   try {
     const query = knex
       .select(
