@@ -62,7 +62,9 @@ router.post("/api/logout", (req, res) => {
 });
 
 router.get("/api/user", (req, res) => {
-  if (req.session.passport && req.session.passport.user) {
+  console.log(req.session + "session");
+  console.log(req.sessionID + "sessionID");
+  if (req.session.passport) {
     deserializeUser(req.session.passport.user, (err, user) => {
       if (err) {
         console.log(err);
