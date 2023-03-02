@@ -1,6 +1,6 @@
-// const isAuth = require("./AuthMiddleware").isAuth;
-// const isAdmin = require("./AuthMiddleware").isAdmin;
-// const isGuide = require("./AuthMiddleware").isGuide;
+const isAuth = require("./AuthMiddleware").isAuth;
+const isAdmin = require("./AuthMiddleware").isAdmin;
+const isGuide = require("./AuthMiddleware").isGuide;
 
 const knex = require("knex")({
   client: "pg",
@@ -9,7 +9,6 @@ const knex = require("knex")({
 
 const router = require("express").Router();
 const passport = require("passport");
-
 router.post(
   "/api/:userType/login",
   function (req, res, next) {
@@ -19,14 +18,20 @@ router.post(
   passport.authenticate("local", {
     successRedirect: "/success",
     failureRedirect: "/failure",
-  })
+  }),
+  function (req, res) {
+    // Store user object in session
+    req.login(req.user, function (err) {
+      if (err) {
+        return next(err);
+      }
+      res.status(200).json({
+        message: "Login successful",
+        data: { user: req.user },
+      });
+    });
+  }
 );
-router.get("/success", (req, res) => {
-  res.status(200).json({
-    message: "Login successful",
-    data: { user: req.user },
-  });
-});
 
 router.get("/failure", (req, res) => {
   res.status(401).json({
