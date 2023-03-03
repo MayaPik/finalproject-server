@@ -46,7 +46,6 @@ passport.deserializeUser((user_id, done) => {
       if (!user) {
         return done(new Error("Invalid user id"));
       }
-      console.log("deserializeUser user2:", user);
       done(null, user);
     })
     .catch((err) => done(err));
