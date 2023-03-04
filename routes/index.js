@@ -188,6 +188,7 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
     res.status(500).send(err.message);
   }
 });
+
 router.get(`/api/getOngoingMessages`, isGuide, async (req, res) => {
   const day = req.query.day;
   const guideid = req.query.guideid;
@@ -202,7 +203,7 @@ router.get(`/api/getOngoingMessages`, isGuide, async (req, res) => {
       .andWhere("ongoing.date", "=", date)
       .andWhereRaw("ongoing.message ~ '[a-zA-Z]'")
       .andWhere("child.guideid", "=", guideid)
-      .andWhereNotNull("ongoing.message");
+      .whereNotNull("ongoing.message");
 
     const result = await query;
 
