@@ -189,7 +189,9 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
   }
 });
 router.get(`/api/getOngoingMessages`, isGuide, async (req, res) => {
-  const { day, guideid, date } = req.query;
+  const day = req.query.day;
+  const guideid = req.query.guideid;
+  const date = req.query.date;
 
   try {
     const query = knex
@@ -199,8 +201,8 @@ router.get(`/api/getOngoingMessages`, isGuide, async (req, res) => {
       .where("ongoing.day", "=", day)
       .andWhere("ongoing.date", "=", date)
       .andWhereRaw("ongoing.message ~ '[a-zA-Z]'")
-      .andWhere("child.guideid", guideid)
-      .whereNotNull("ongoing.message"); // <-- added this line
+      .andWhere("child.guideid", "=", guideid)
+      .andWhereNotNull("ongoing.message");
 
     const result = await query;
 
