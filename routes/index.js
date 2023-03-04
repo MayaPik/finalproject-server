@@ -95,11 +95,11 @@ router.post(`/api/updateFixedTimes`, isAuth, async (req, res) => {
 });
 
 router.post(`/api/updateOngoingTimes`, isAuth, async (req, res) => {
-  const { childid, day, time, date } = req.body;
+  const { childid, day, time, date, message } = req.body;
   try {
     const result = await knex("ongoing").where({ childid, day, date });
     if (result.length === 0) {
-      await knex("ongoing").insert({ childid, day, time, date });
+      await knex("ongoing").insert({ childid, day, time, date, message });
     } else {
       await knex("ongoing").where({ childid, day, date }).update({ time });
     }
