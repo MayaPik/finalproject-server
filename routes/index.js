@@ -101,7 +101,9 @@ router.post(`/api/updateOngoingTimes`, isAuth, async (req, res) => {
     if (result.length === 0) {
       await knex("ongoing").insert({ childid, day, time, date, message });
     } else {
-      await knex("ongoing").where({ childid, day, date }).update({ time });
+      await knex("ongoing")
+        .where({ childid, day, date })
+        .update({ time, message });
     }
     res.json({ success: true });
   } catch (err) {
