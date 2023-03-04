@@ -211,6 +211,7 @@ router.get(`/api/getOngoingMessages`, isGuide, async (req, res) => {
       return res.json({ message: "No ongoing messages found." });
     } else {
       const messages = result.map((row) => ({
+        childid: row.childid,
         first_name: row.first_name,
         last_name: row.last_name,
         message: row.message,
