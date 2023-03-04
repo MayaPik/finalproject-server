@@ -188,25 +188,19 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
     res.status(500).send(err.message);
   }
 });
-
 router.get(`/api/getOngoingMessages`, isGuide, async (req, res) => {
   const { day, guideid, date } = req.query;
 
   try {
     const query = knex
-      .select(
-        "child.first_name",
-        "child.last_name",
-        "child.guideid",
-        "ongoing.message"
-      )
+      .select("child.first_name", "child.last_name", "ongoing.message")
       .from("child")
       .innerJoin("ongoing", "child.childid", "ongoing.childid")
       .where("ongoing.day", "=", day)
       .andWhere("ongoing.date", "=", date)
       .andWhereRaw("ongoing.message ~ '[a-zA-Z]'")
       .andWhere("child.guideid", guideid)
-      .andWhereNotNull("ongoing.message");
+      .whereNotNull("ongoing.message"); // <-- added this line
 
     const result = await query;
 
@@ -218,7 +212,7 @@ router.get(`/api/getOngoingMessages`, isGuide, async (req, res) => {
         last_name: row.last_name,
         message: row.message,
       }));
-      console.log(messages);
+
       return res.json({
         message: "Ongoing messages retrieved successfully.",
         data: messages,
