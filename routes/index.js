@@ -75,7 +75,7 @@ router.post("/reset-password", async (req, res) => {
   const { phoneNumber, verificationCode, newPassword } = req.body;
   console.log("Stored Verification Code:", storedVerificationCode[phoneNumber]);
   console.log("Received Verification Code:", verificationCode);
-  if (verificationCode !== storedVerificationCode[phoneNumber]) {
+  if (verificationCode != storedVerificationCode[phoneNumber]) {
     return res.status(400).send({ error: "Invalid verification code." });
   }
 
