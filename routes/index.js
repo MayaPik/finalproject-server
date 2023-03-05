@@ -23,13 +23,13 @@ const sendVerificationCodeLimiter = rateLimit({
   max: 5,
   message: "Too many requests, please try again later.",
 });
+const storedVerificationCode = {};
 
 router.post(
   "/send-verification-code",
   sendVerificationCodeLimiter,
   async (req, res) => {
     const { phoneNumber } = req.body;
-    const storedVerificationCode = {};
     Promise.all([
       knex("admin").where({ phone_number: phoneNumber }).select(),
       knex("child").where({ phone_number: phoneNumber }).select(),
