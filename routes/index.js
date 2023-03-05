@@ -33,7 +33,7 @@ router.post(
     const { phoneNumber } = req.body;
     const hashedPhoneNumber = bcrypt.hashSync(phoneNumber, 10); // hash the input phone number
     knex("guide")
-      .where({ phone_number_hash: hashedPhoneNumber }) // query using the hashed phone number
+      .where({ phone_number: hashedPhoneNumber }) // query using the hashed phone number
       .select()
       .then((results) => {
         const user = results.reduce((acc, val) => acc.concat(val), [])[0];
