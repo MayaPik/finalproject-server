@@ -30,7 +30,6 @@ router.post(
   async (req, res) => {
     const { phoneNumber } = req.body;
     const storedVerificationCode = {};
-
     Promise.all([
       knex("admin").where({ phone_number: phoneNumber }).select(),
       knex("child").where({ phone_number: phoneNumber }).select(),
