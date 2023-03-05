@@ -30,20 +30,24 @@ router.post(
   sendVerificationCodeLimiter,
   async (req, res) => {
     const { phoneNumber } = req.body;
+    const hashedPhoneNumber = bcrypt.hashSync(phoneNumber, 10); // hash the input phone number
     knex("guide")
-      .where({ phone_number: phoneNumber })
+      .where({ phone_number_hash: hashedPhoneNumber }) // query using the hashed phone number
       .select()
       .then((results) => {
         const user = results.reduce((acc, val) => acc.concat(val), [])[0];
         if (!user) {
           return res.status(400).send({ error: "Invalid phone number." });
         }
-        const match = bcrypt.compareSync(phoneNumber, user.phone_number);
+        const match = bcrypt.compareSync(
+          hashedPhoneNumber,
+          user.phone_number_hash
+        ); // compare hashed phone numbers
         if (!match) {
           return res.status(400).send({ error: "Invalid phone number." });
         }
         const verificationCode = Math.floor(100000 + Math.random() * 900000);
-        storedVerificationCode[phoneNumber] = verificationCode;
+        storedVerificationCode[hashedPhoneNumber] = verificationCode; // store hashed phone number
         client.messages
           .create({
             body: `Your verification code is ${verificationCode}`,
@@ -67,6 +71,7 @@ router.post(
       });
   }
 );
+
 router.post("/reset-password", async (req, res) => {
   const { phoneNumber, verificationCode, newPassword } = req.body;
 
