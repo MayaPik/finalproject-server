@@ -24,12 +24,13 @@ const sendVerificationCodeLimiter = rateLimit({
   message: "Too many requests, please try again later.",
 });
 
+const storedVerificationCode = {};
+
 router.post(
   "/send-verification-code",
   sendVerificationCodeLimiter,
   async (req, res) => {
     const { phoneNumber } = req.body;
-    const storedVerificationCode = {};
     Promise.all([
       // knex("admin").where({ phone_number: phoneNumber }).select(),
       // knex("child").where({ phone_number: phoneNumber }).select(),
@@ -70,7 +71,8 @@ router.post(
 
 router.post("/reset-password", async (req, res) => {
   const { phoneNumber, verificationCode, newPassword } = req.body;
-  const storedVerificationCode = {};
+  console.log("Stored Verification Code:", storedVerificationCode[phoneNumber]);
+  console.log("Received Verification Code:", verificationCode);
   if (verificationCode !== storedVerificationCode[phoneNumber]) {
     return res.status(400).send({ error: "Invalid verification code." });
   }
