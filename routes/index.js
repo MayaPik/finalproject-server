@@ -43,12 +43,12 @@ router.post(
             .status(400)
             .send({ error: "Invalid phone number- no user" });
         }
-        const match = bcrypt.compareSync(phoneNumber, user.phone_number); // compare hashed phone numbers
-        if (!match) {
-          return res
-            .status(400)
-            .send({ error: "Invalid phone number- no sync" });
-        }
+        // const match = bcrypt.compareSync(phoneNumber, user.phone_number); // compare hashed phone numbers
+        // if (!match) {
+        //   return res
+        //     .status(400)
+        //     .send({ error: "Invalid phone number- no sync" });
+        // }
         const verificationCode = Math.floor(100000 + Math.random() * 900000);
         storedVerificationCode[phoneNumber] = verificationCode; // store hashed phone number
         client.messages
