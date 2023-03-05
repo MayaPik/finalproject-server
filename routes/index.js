@@ -24,18 +24,18 @@ const sendVerificationCodeLimiter = rateLimit({
   message: "Too many requests, please try again later.",
 });
 
-const storedVerificationCode = {};
-
 router.post(
   "/send-verification-code",
   sendVerificationCodeLimiter,
   async (req, res) => {
     const { phoneNumber } = req.body;
-    // const hashedPhoneNumber = bcrypt.hashSync(phoneNumber, 12); // hash the input phone number
-    // console.log(hashedPhoneNumber);
-    knex("guide")
-      .where({ phone_number: phoneNumber }) // query using the hashed phone number
-      .select()
+    const storedVerificationCode = {};
+
+    Promise.all([
+      knex("admin").where({ phone_number: phoneNumber }).select(),
+      knex("child").where({ phone_number: phoneNumber }).select(),
+      knex("guide").where({ phone_number: phoneNumber }).select(),
+    ])
       .then((results) => {
         const user = results.reduce((acc, val) => acc.concat(val), [])[0];
         if (!user) {
@@ -43,14 +43,8 @@ router.post(
             .status(400)
             .send({ error: "Invalid phone number- no user" });
         }
-        // const match = bcrypt.compareSync(phoneNumber, user.phone_number); // compare hashed phone numbers
-        // if (!match) {
-        //   return res
-        //     .status(400)
-        //     .send({ error: "Invalid phone number- no sync" });
-        // }
         const verificationCode = Math.floor(100000 + Math.random() * 900000);
-        storedVerificationCode[phoneNumber] = verificationCode; // store hashed phone number
+        storedVerificationCode[phoneNumber] = verificationCode;
         client.messages
           .create({
             body: `Your verification code is ${verificationCode}`,
@@ -77,8 +71,6 @@ router.post(
 
 router.post("/reset-password", async (req, res) => {
   const { phoneNumber, verificationCode, newPassword } = req.body;
-
-  // Verify the user input against the stored verification code
   if (verificationCode !== storedVerificationCode[phoneNumber]) {
     return res.status(400).send({ error: "Invalid verification code." });
   }
@@ -105,7 +97,6 @@ router.post("/reset-password", async (req, res) => {
     return res.status(400).send({ error: "Invalid phone number." });
   }
 
-  // Remove the stored verification code
   delete storedVerificationCode[phoneNumber];
 
   res.status(200).send({ message: "Password reset successfully." });
