@@ -31,10 +31,10 @@ router.post(
   sendVerificationCodeLimiter,
   async (req, res) => {
     const { phoneNumber } = req.body;
-    const hashedPhoneNumber = bcrypt.hashSync(phoneNumber, 12); // hash the input phone number
-    console.log(hashedPhoneNumber);
+    // const hashedPhoneNumber = bcrypt.hashSync(phoneNumber, 12); // hash the input phone number
+    // console.log(hashedPhoneNumber);
     knex("guide")
-      .where({ phone_number: hashedPhoneNumber }) // query using the hashed phone number
+      .where({ phone_number: phoneNumber }) // query using the hashed phone number
       .select()
       .then((results) => {
         const user = results.reduce((acc, val) => acc.concat(val), [])[0];
@@ -43,14 +43,14 @@ router.post(
             .status(400)
             .send({ error: "Invalid phone number- no user" });
         }
-        const match = bcrypt.compareSync(hashedPhoneNumber, user.phone_number); // compare hashed phone numbers
+        const match = bcrypt.compareSync(phoneNumber, user.phone_number); // compare hashed phone numbers
         if (!match) {
           return res
             .status(400)
             .send({ error: "Invalid phone number- no sync" });
         }
         const verificationCode = Math.floor(100000 + Math.random() * 900000);
-        storedVerificationCode[hashedPhoneNumber] = verificationCode; // store hashed phone number
+        storedVerificationCode[phoneNumber] = verificationCode; // store hashed phone number
         client.messages
           .create({
             body: `Your verification code is ${verificationCode}`,
