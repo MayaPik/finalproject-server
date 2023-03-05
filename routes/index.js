@@ -30,11 +30,9 @@ router.post(
   sendVerificationCodeLimiter,
   async (req, res) => {
     const { phoneNumber } = req.body;
-    Promise.all([
-      knex("admin").where({ phone_number: phoneNumber }).select(),
-      knex("child").where({ phone_number: phoneNumber }).select(),
-      knex("guide").where({ phone_number: phoneNumber }).select(),
-    ])
+    knex("guide")
+      .where({ phone_number: phoneNumber })
+      .select()
       .then((results) => {
         const user = results.reduce((acc, val) => acc.concat(val), [])[0];
         if (!user) {
