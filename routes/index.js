@@ -10,6 +10,101 @@ const knex = require("knex")({
 
 const router = require("express").Router();
 const passport = require("passport");
+
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = require("twilio")(accountSid, authToken);
+
+const rateLimit = require("express-rate-limit");
+
+const sendVerificationCodeLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 5,
+  message: "Too many requests, please try again later.",
+});
+
+const storedVerificationCode = {};
+
+router.post(
+  "/send-verification-code",
+  sendVerificationCodeLimiter,
+  async (req, res) => {
+    const { phoneNumber } = req.body;
+    Promise.all([
+      knex("admin").where({ phone_number: phoneNumber }).select(),
+      knex("child").where({ phone_number: phoneNumber }).select(),
+      knex("guide").where({ phone_number: phoneNumber }).select(),
+    ])
+      .then((results) => {
+        const user = results.reduce((acc, val) => acc.concat(val), [])[0];
+        if (!user) {
+          return res.status(400).send({ error: "Invalid phone number." });
+        }
+        const match = bcrypt.compareSync(phoneNumber, user.phone_number);
+        if (!match) {
+          return res.status(400).send({ error: "Invalid phone number." });
+        }
+        const verificationCode = Math.floor(100000 + Math.random() * 900000);
+        storedVerificationCode[phoneNumber] = verificationCode;
+        client.messages
+          .create({
+            body: `Your verification code is ${verificationCode}`,
+            from: "+15076056709",
+            to: phoneNumber,
+          })
+          .then((message) => {
+            console.log(message.sid);
+            res
+              .status(200)
+              .send({ message: "Verification code sent successfully." });
+          })
+          .catch((error) => {
+            console.error(error);
+            res.status(500).send({ error: "Error sending verification code." });
+          });
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).send({ error: "Error querying database." });
+      });
+  }
+);
+router.post("/reset-password", async (req, res) => {
+  const { phoneNumber, verificationCode, newPassword } = req.body;
+
+  // Verify the user input against the stored verification code
+  if (verificationCode !== storedVerificationCode[phoneNumber]) {
+    return res.status(400).send({ error: "Invalid verification code." });
+  }
+
+  // Reset the user's password
+  const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+  // Check if the phone number exists in any of the three tables and update the password for the matching user
+  const adminUser = await knex("admin")
+    .where({ phone_number: phoneNumber })
+    .update({ password: hashedPassword });
+
+  const childUser = await knex("child")
+    .where({ phone_number: phoneNumber })
+    .update({ password: hashedPassword });
+
+  const guideUser = await knex("guide")
+    .where({ phone_number: phoneNumber })
+    .update({ password: hashedPassword });
+
+  const updatedUser = adminUser || childUser || guideUser;
+
+  if (!updatedUser) {
+    return res.status(400).send({ error: "Invalid phone number." });
+  }
+
+  // Remove the stored verification code
+  delete storedVerificationCode[phoneNumber];
+
+  res.status(200).send({ message: "Password reset successfully." });
+});
+
 router.post(
   "/api/:userType/login",
   function (req, res, next) {
