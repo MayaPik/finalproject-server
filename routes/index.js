@@ -55,7 +55,7 @@ router.post(
           .create({
             body: `Your verification code is ${verificationCode}`,
             from: "+15076056709",
-            to: phoneNumber,
+            to: "+972-543517720",
           })
           .then((message) => {
             console.log(message.sid);
