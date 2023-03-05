@@ -31,7 +31,7 @@ router.post(
   sendVerificationCodeLimiter,
   async (req, res) => {
     const { phoneNumber } = req.body;
-    const hashedPhoneNumber = bcrypt.hashSync(phoneNumber, 10); // hash the input phone number
+    const hashedPhoneNumber = bcrypt.hashSync(phoneNumber, 12); // hash the input phone number
     knex("guide")
       .where({ phone_number: hashedPhoneNumber }) // query using the hashed phone number
       .select()
