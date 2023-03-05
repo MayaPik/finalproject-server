@@ -80,7 +80,7 @@ router.post("/reset-password", async (req, res) => {
   }
 
   // Reset the user's password
-  const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+  const hashedPassword = await bcrypt.hash(newPassword, 12);
 
   // Check if the phone number exists in any of the three tables and update the password for the matching user
   // const adminUser = await knex("admin")
