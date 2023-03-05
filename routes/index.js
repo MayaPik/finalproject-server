@@ -2,6 +2,7 @@ const isAuth = require("./AuthMiddleware").isAuth;
 const isAdmin = require("./AuthMiddleware").isAdmin;
 const isGuide = require("./AuthMiddleware").isGuide;
 const deserializeUser = require("./deserializeUser");
+const bcrypt = require("bcrypt");
 
 const knex = require("knex")({
   client: "pg",
