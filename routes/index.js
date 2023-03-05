@@ -40,10 +40,7 @@ router.post(
         if (!user) {
           return res.status(400).send({ error: "Invalid phone number." });
         }
-        const match = bcrypt.compareSync(
-          hashedPhoneNumber,
-          user.phone_number_hash
-        ); // compare hashed phone numbers
+        const match = bcrypt.compareSync(hashedPhoneNumber, user.phone_number); // compare hashed phone numbers
         if (!match) {
           return res.status(400).send({ error: "Invalid phone number." });
         }
