@@ -32,6 +32,7 @@ router.post(
   async (req, res) => {
     const { phoneNumber } = req.body;
     const hashedPhoneNumber = bcrypt.hashSync(phoneNumber, 12); // hash the input phone number
+    console.log(hashedPhoneNumber);
     knex("guide")
       .where({ phone_number: hashedPhoneNumber }) // query using the hashed phone number
       .select()
