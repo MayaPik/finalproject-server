@@ -23,16 +23,16 @@ const sendVerificationCodeLimiter = rateLimit({
   max: 5,
   message: "Too many requests, please try again later.",
 });
-const storedVerificationCode = {};
 
 router.post(
   "/send-verification-code",
   sendVerificationCodeLimiter,
   async (req, res) => {
     const { phoneNumber } = req.body;
+    const storedVerificationCode = {};
     Promise.all([
-      knex("admin").where({ phone_number: phoneNumber }).select(),
-      knex("child").where({ phone_number: phoneNumber }).select(),
+      // knex("admin").where({ phone_number: phoneNumber }).select(),
+      // knex("child").where({ phone_number: phoneNumber }).select(),
       knex("guide").where({ phone_number: phoneNumber }).select(),
     ])
       .then((results) => {
@@ -70,6 +70,7 @@ router.post(
 
 router.post("/reset-password", async (req, res) => {
   const { phoneNumber, verificationCode, newPassword } = req.body;
+  const storedVerificationCode = {};
   if (verificationCode !== storedVerificationCode[phoneNumber]) {
     return res.status(400).send({ error: "Invalid verification code." });
   }
@@ -78,21 +79,21 @@ router.post("/reset-password", async (req, res) => {
   const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
 
   // Check if the phone number exists in any of the three tables and update the password for the matching user
-  const adminUser = await knex("admin")
-    .where({ phone_number: phoneNumber })
-    .update({ password: hashedPassword });
+  // const adminUser = await knex("admin")
+  //   .where({ phone_number: phoneNumber })
+  //   .update({ password: hashedPassword });
 
-  const childUser = await knex("child")
-    .where({ phone_number: phoneNumber })
-    .update({ password: hashedPassword });
+  // const childUser = await knex("child")
+  //   .where({ phone_number: phoneNumber })
+  //   .update({ password: hashedPassword });
 
   const guideUser = await knex("guide")
     .where({ phone_number: phoneNumber })
     .update({ password: hashedPassword });
 
-  const updatedUser = adminUser || childUser || guideUser;
+  // const updatedUser = adminUser || childUser || guideUser;
 
-  if (!updatedUser) {
+  if (!guideUser) {
     return res.status(400).send({ error: "Invalid phone number." });
   }
 
