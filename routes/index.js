@@ -45,6 +45,8 @@ router.post(
         }
         const verificationCode = Math.floor(100000 + Math.random() * 900000);
         storedVerificationCode[phoneNumber] = verificationCode;
+        console.log("Stored Verification Code:", storedVerificationCode);
+
         client.messages
           .create({
             body: `Your verification code is ${verificationCode}`,
