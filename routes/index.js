@@ -33,7 +33,7 @@ router.post(
     const { phoneNumber } = req.body;
     Promise.all([
       knex("admin").where({ phone_number: phoneNumber }).select(),
-      knex("admin").where({ phone_number2: phoneNumber }).select(),
+      knex("child").where({ phone_number2: phoneNumber }).select(),
       knex("child").where({ phone_number: phoneNumber }).select(),
       knex("guide").where({ phone_number: phoneNumber }).select(),
     ])
