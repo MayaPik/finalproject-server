@@ -14,7 +14,7 @@ passport.use(
       passwordField: "password",
       passReqToCallback: true,
     },
-    async (req, usernameOrPhone, password, done) => {
+    async (req, username, password, done) => {
       const userType = req.query.userType;
       const user = await knex(userType)
         .where(function () {
