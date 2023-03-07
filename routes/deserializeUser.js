@@ -14,6 +14,7 @@ module.exports = function deserializeUser(user_id, done) {
       if (!user) {
         return done(new Error("Invalid user id"));
       }
+      delete user.password;
       done(null, user);
     })
     .catch((err) => done(err));

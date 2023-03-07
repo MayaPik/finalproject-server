@@ -28,7 +28,6 @@ passport.use(
       }
       const match = await bcrypt.compare(password, user.password);
       if (match) {
-        delete user.password;
         return done(null, user);
       } else {
         return done(null, false);
