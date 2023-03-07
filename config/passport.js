@@ -18,9 +18,11 @@ passport.use(
       const userType = req.query.userType;
       const user = await knex(userType)
         .where(function () {
-          this.where({ username: username }).orWhere({
-            phone_number: username,
-          });
+          this.where({ username: username })
+            .orWhere({
+              phone_number: username,
+            })
+            .orWhere({ phone_number2: username });
         })
         .first();
       if (!user) {
