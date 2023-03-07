@@ -172,8 +172,6 @@ router.post(
         data: {
           session: req.session,
           user: req.user,
-          req: req.session.user,
-          user_id: req.session.passport.user,
         },
       });
     });
@@ -186,8 +184,6 @@ router.get("/success", (req, res) => {
     data: {
       session: req.session,
       user: req.user,
-      req: req.session.user,
-      user_id: req.session.passport.user,
     },
   });
 });

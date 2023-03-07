@@ -7,22 +7,28 @@ const knex = require("knex")({
   client: "pg",
   connection: process.env.DATABASE_URL,
 });
-
 passport.use(
   new LocalStrategy(
     {
-      usernameField: "username",
+      usernameField: "usernameOrPhone",
       passwordField: "password",
       passReqToCallback: true,
     },
-    async (req, username, password, done) => {
+    async (req, usernameOrPhone, password, done) => {
       const userType = req.query.userType;
-      const user = await knex(userType).where({ username: username }).first();
+      const user = await knex(userType)
+        .where(function () {
+          this.where({ username: usernameOrPhone }).orWhere({
+            phone: usernameOrPhone,
+          });
+        })
+        .first();
       if (!user) {
         return done(null, false);
       }
       const match = await bcrypt.compare(password, user.password);
       if (match) {
+        delete user.password;
         return done(null, user);
       } else {
         return done(null, false);
