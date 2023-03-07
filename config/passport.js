@@ -10,7 +10,7 @@ const knex = require("knex")({
 passport.use(
   new LocalStrategy(
     {
-      usernameField: "usernameOrPhone",
+      usernameField: "username",
       passwordField: "password",
       passReqToCallback: true,
     },
@@ -18,8 +18,8 @@ passport.use(
       const userType = req.query.userType;
       const user = await knex(userType)
         .where(function () {
-          this.where({ username: usernameOrPhone }).orWhere({
-            phone: usernameOrPhone,
+          this.where({ username: username }).orWhere({
+            phone_number: username,
           });
         })
         .first();
