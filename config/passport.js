@@ -7,6 +7,7 @@ const knex = require("knex")({
   client: "pg",
   connection: process.env.DATABASE_URL,
 });
+
 passport.use(
   new LocalStrategy(
     {
@@ -16,15 +17,13 @@ passport.use(
     },
     async (req, username, password, done) => {
       const userType = req.query.userType;
-      const user = await knex(userType)
-        .where(function () {
-          this.where({ username: username })
-            .orWhere({
-              phone_number: username,
-            })
-            .orWhere({ phone_number2: username });
-        })
-        .first();
+      let userQuery = knex(userType).where(function () {
+        this.where({ username: username }).orWhere({ phone_number: username });
+        if (userType === "child") {
+          this.orWhere({ phone_number2: username });
+        }
+      });
+      const user = await userQuery.first();
       if (!user) {
         return done(null, false);
       }
