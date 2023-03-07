@@ -32,8 +32,9 @@ router.post(
   async (req, res) => {
     const { phoneNumber } = req.body;
     Promise.all([
-      // knex("admin").where({ phone_number: phoneNumber }).select(),
-      // knex("child").where({ phone_number: phoneNumber }).select(),
+      knex("admin").where({ phone_number: phoneNumber }).select(),
+      knex("admin").where({ phone_number2: phoneNumber }).select(),
+      knex("child").where({ phone_number: phoneNumber }).select(),
       knex("guide").where({ phone_number: phoneNumber }).select(),
     ])
       .then((results) => {
@@ -73,37 +74,82 @@ router.post(
 
 router.post("/reset-password", async (req, res) => {
   const { phoneNumber, verificationCode, newPassword } = req.body;
-  console.log("Stored Verification Code:", storedVerificationCode[phoneNumber]);
-  console.log("Received Verification Code:", verificationCode);
   if (verificationCode != storedVerificationCode[phoneNumber]) {
     return res.status(400).send({ error: "Invalid verification code." });
   }
 
-  // Reset the user's password
   const hashedPassword = await bcrypt.hash(newPassword, 12);
 
-  // Check if the phone number exists in any of the three tables and update the password for the matching user
-  // const adminUser = await knex("admin")
-  //   .where({ phone_number: phoneNumber })
-  //   .update({ password: hashedPassword });
+  const adminUser = await knex("admin")
+    .where({ phone_number: phoneNumber })
+    .update({ password: hashedPassword });
 
-  // const childUser = await knex("child")
-  //   .where({ phone_number: phoneNumber })
-  //   .update({ password: hashedPassword });
+  const childUser = await knex("child")
+    .where({ phone_number: phoneNumber })
+    .update({ password: hashedPassword });
+
+  const childUser2 = await knex("child")
+    .where({ phone_number2: phoneNumber })
+    .update({ password: hashedPassword });
 
   const guideUser = await knex("guide")
     .where({ phone_number: phoneNumber })
     .update({ password: hashedPassword });
 
-  // const updatedUser = adminUser || childUser || guideUser;
+  const updatedUser = adminUser || childUser || guideUser || childUser2;
 
-  if (!guideUser) {
+  if (!updatedUser) {
     return res.status(400).send({ error: "Invalid phone number." });
   }
 
   delete storedVerificationCode[phoneNumber];
 
   res.status(200).send({ message: "Password reset successfully." });
+});
+
+router.post("/change-password", async (req, res) => {
+  const { user_id, oldPassword, newPassword } = req.body;
+  const [adminUser, childUser, guideUser] = await Promise.all([
+    knex("admin").where({ user_id: user_id }).select(),
+    knex("child").where({ user_id: user_id }).select(),
+    knex("guide").where({ user_id: user_id }).select(),
+  ]);
+
+  const user = adminUser[0] || childUser[0] || guideUser[0];
+
+  if (!user) {
+    return res.status(400).send({ error: "Invalid user ID." });
+  }
+
+  const isPasswordCorrect = await bcrypt.compare(oldPassword, user.password);
+
+  if (!isPasswordCorrect) {
+    return res.status(400).send({ error: "Invalid old password." });
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+  let updatedRows = 0;
+
+  if (adminUser.length > 0) {
+    updatedRows = await knex("admin")
+      .where({ user_id: user_id })
+      .update({ password: hashedPassword });
+  } else if (childUser.length > 0) {
+    updatedRows = await knex("child")
+      .where({ user_id: user_id })
+      .update({ password: hashedPassword });
+  } else if (guideUser.length > 0) {
+    updatedRows = await knex("guide")
+      .where({ user_id: user_id })
+      .update({ password: hashedPassword });
+  }
+
+  if (updatedRows === 0) {
+    return res.status(400).send({ error: "Password update failed." });
+  }
+
+  res.status(200).send({ message: "Password changed successfully." });
 });
 
 router.post(
