@@ -20,6 +20,7 @@ app.use(
       maxAge: 30 * 24 * 60 * 60 * 4000, //120 days
       secure: true,
       domain: ".pickinguptime.com",
+      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 4000),
     },
     proxy: true,
   })

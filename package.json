@@ -4,7 +4,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "start": "pm2-runtime start ecosystem.config.js --env production"
   },
   "keywords": [],
   "author": "",
@@ -23,10 +23,12 @@
     "express-validator": "^6.15.0",
     "jsonwebtoken": "^9.0.0",
     "knex": "^2.4.2",
+    "npm2": "^2.0.0",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
     "path": "^0.12.7",
     "pg": "^8.9.0",
+    "pm2": "^5.2.2",
     "twilio": "^4.8.0"
   },
   "engines": {
