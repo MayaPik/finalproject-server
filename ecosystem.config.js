@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: "my-app",
-      script: "./app.js",
+      script: "app.js",
       autorestart: true,
       instances: "max",
       env: {
