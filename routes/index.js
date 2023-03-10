@@ -344,7 +344,8 @@ router.get(`/api/getOngoingMessages`, isGuide, async (req, res) => {
       .where("ongoing.day", "=", day)
       .andWhere("ongoing.date", "=", date)
       .andWhere("child.guideid", "=", guideid)
-      .whereNotNull("ongoing.message");
+      .whereNotNull("ongoing.message")
+      .andWhere("ongoing.message", "!=", "");
 
     const result = await query;
 
