@@ -7,6 +7,10 @@ const bcrypt = require("bcrypt");
 const knex = require("knex")({
   client: "pg",
   connection: process.env.DATABASE_URL,
+  pool: {
+    min: 0,
+    max: 5,
+  },
 });
 
 const router = require("express").Router();
