@@ -330,7 +330,6 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
     res.status(500).send(err.message);
   }
 });
-
 router.get(`/api/getOngoingMessages`, isGuide, async (req, res) => {
   const day = req.query.day;
   const guideid = req.query.guideid;
