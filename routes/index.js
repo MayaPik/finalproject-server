@@ -267,7 +267,7 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
         "child.first_name",
         "child.last_name",
         "child.classid",
-        knex.raw("COALESCE(fixed.time, ongoing.time, ?) AS time", [time])
+        knex.raw("COALESCE(ongoing.time, fixed.time, ?) AS time", [time])
       )
       .from("child")
       .leftJoin("fixed", function () {
