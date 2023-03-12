@@ -9,7 +9,7 @@ const knex = require("knex")({
   connection: process.env.DATABASE_URL,
   pool: {
     min: 0,
-    max: 10,
+    max: 2,
   },
 });
 
@@ -267,7 +267,10 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
         "child.first_name",
         "child.last_name",
         "child.classid",
-        knex.raw("COALESCE(ongoing.time, fixed.time, ?) AS time", [time])
+        knex.raw("CASE WHEN ? = 'else' THEN ongoing.time ELSE ? END AS time", [
+          time,
+          time,
+        ])
       )
       .from("child")
       .leftJoin("fixed", function () {
@@ -281,23 +284,27 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
       .leftJoin("ongoing", function () {
         this.on("child.childid", "=", "ongoing.childid")
           .andOn("ongoing.day", "=", knex.raw("?", [day]))
-          .andOn("ongoing.time", "=", knex.raw("?", [time]))
           .andOn("ongoing.date", "=", knex.raw("?", [date]));
-
+        if (time === "else") {
+          this.andOnNotIn("ongoing.time", ["15:00", "15:30", "00:00"]);
+        } else {
+          this.andOn("ongoing.time", "=", knex.raw("?", [time]));
+        }
         if (guideid) {
           this.andOn("child.guideid", "=", knex.raw("?", [guideid]));
         }
       })
-      .whereNotNull("child.childid")
+      .where(function () {
+        this.whereNotNull("fixed.childid").orWhereNotNull("ongoing.childid");
+      })
       .groupBy(
         "child.childid",
         "child.first_name",
         "child.last_name",
         "child.classid",
-        "ongoing.time",
-        "fixed.time"
+        "ongoing.time"
       )
-      .orderBy("child.childid");
+      .havingRaw("MAX(ongoing.childid) IS NOT NULL");
 
     const result = await query;
 
@@ -323,7 +330,6 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
     res.status(500).send(err.message);
   }
 });
-
 router.get(`/api/getOngoingMessages`, isGuide, async (req, res) => {
   const day = req.query.day;
   const guideid = req.query.guideid;
