@@ -253,7 +253,6 @@ router.post(`/api/updateOngoingTimes`, isAuth, async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-
 router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
   const day = req.query.day;
   const time = req.query.time;
@@ -267,10 +266,7 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
         "child.first_name",
         "child.last_name",
         "child.classid",
-        knex.raw("CASE WHEN ? = 'else' THEN ongoing.time ELSE ? END AS time", [
-          time,
-          time,
-        ])
+        knex.raw("COALESCE(ongoing.time, ?) AS time", [time])
       )
       .from("child")
       .leftJoin("fixed", function () {
@@ -317,7 +313,7 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
           first_name: child.first_name,
           last_name: child.last_name,
           class: child.classid,
-          ...(req.query.time === "else" ? { time: child.time } : {}),
+          time: child.time,
         };
       });
       res.json({
@@ -330,6 +326,7 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
     res.status(500).send(err.message);
   }
 });
+
 router.get(`/api/getOngoingMessages`, isGuide, async (req, res) => {
   const day = req.query.day;
   const guideid = req.query.guideid;
