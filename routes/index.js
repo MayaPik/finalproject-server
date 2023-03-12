@@ -9,7 +9,7 @@ const knex = require("knex")({
   connection: process.env.DATABASE_URL,
   pool: {
     min: 0,
-    max: 2,
+    max: 4,
   },
 });
 
@@ -253,6 +253,7 @@ router.post(`/api/updateOngoingTimes`, isAuth, async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
 router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
   const day = req.query.day;
   const time = req.query.time;
@@ -266,7 +267,10 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
         "child.first_name",
         "child.last_name",
         "child.classid",
-        knex.raw("COALESCE(ongoing.time, ?) AS time", [time])
+        knex.raw("CASE WHEN ? = 'else' THEN ongoing.time ELSE ? END AS time", [
+          time,
+          time,
+        ])
       )
       .from("child")
       .leftJoin("fixed", function () {
@@ -313,7 +317,7 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
           first_name: child.first_name,
           last_name: child.last_name,
           class: child.classid,
-          time: child.time,
+          ...(req.query.time === "else" ? { time: child.time } : {}),
         };
       });
       res.json({
