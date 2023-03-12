@@ -281,19 +281,14 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
       .leftJoin("ongoing", function () {
         this.on("child.childid", "=", "ongoing.childid")
           .andOn("ongoing.day", "=", knex.raw("?", [day]))
+          .andOn("ongoing.time", "=", knex.raw("?", [time]))
           .andOn("ongoing.date", "=", knex.raw("?", [date]));
-        if (time === "else") {
-          this.andOnNotIn("ongoing.time", ["15:00", "15:30", "00:00"]);
-        } else {
-          this.andOn("ongoing.time", "=", knex.raw("?", [time]));
-        }
+
         if (guideid) {
           this.andOn("child.guideid", "=", knex.raw("?", [guideid]));
         }
       })
-      .where(function () {
-        this.whereNotNull("fixed.childid").orWhereNotNull("ongoing.childid");
-      })
+      .whereNotNull("child.childid")
       .groupBy(
         "child.childid",
         "child.first_name",
@@ -302,7 +297,7 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
         "ongoing.time",
         "fixed.time"
       )
-      .havingRaw("MAX(ongoing.childid) IS NOT NULL");
+      .orderBy("child.childid");
 
     const result = await query;
 
