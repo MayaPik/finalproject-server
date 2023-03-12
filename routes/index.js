@@ -301,10 +301,11 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
         "child.childid",
         "child.first_name",
         "child.last_name",
-        "child.classid",
-        "ongoing.time",
-        "fixed.time"
-      );
+        "child.classid"
+      )
+      .orderByRaw("MAX(ongoing.childid) DESC")
+      .select("ongoing.time", "fixed.time")
+      .limit(1);
 
     const result = await query;
 
