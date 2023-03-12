@@ -302,9 +302,9 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
         "child.first_name",
         "child.last_name",
         "child.classid",
-        "ongoing.time"
-      )
-      .havingRaw("MAX(ongoing.childid) IS NOT NULL");
+        "ongoing.time",
+        "fixed.time"
+      );
 
     const result = await query;
 
@@ -330,6 +330,7 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
     res.status(500).send(err.message);
   }
 });
+
 router.get(`/api/getOngoingMessages`, isGuide, async (req, res) => {
   const day = req.query.day;
   const guideid = req.query.guideid;
