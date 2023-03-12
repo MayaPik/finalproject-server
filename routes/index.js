@@ -299,7 +299,8 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
         "child.first_name",
         "child.last_name",
         "child.classid",
-        "ongoing.time"
+        "ongoing.time",
+        "fixed.time"
       )
       .havingRaw("MAX(ongoing.childid) IS NOT NULL");
 
