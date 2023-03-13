@@ -274,45 +274,56 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
         ])
       )
       .from("child")
-      .leftJoin(
-        knex.raw(
-          "(SELECT childid, MAX(date) as max_date FROM ongoing GROUP BY childid) as max_ongoing"
-        ),
-        "child.childid",
-        "=",
-        "max_ongoing.childid"
+      .whereNotNull(function () {
+        this.select(knex.raw("COALESCE(ongoing.childid, fixed.childid)"))
+          .from("child")
+          .leftJoin("fixed", function () {
+            this.on("child.childid", "=", "fixed.childid")
+              .andOn("fixed.day", "=", knex.raw("?", [day]))
+              .andOn("fixed.time", "=", knex.raw("?", [time]));
+            if (guideid) {
+              this.andOn("child.guideid", "=", knex.raw("?", [guideid]));
+            }
+          })
+          .leftJoin("ongoing", function () {
+            this.on("child.childid", "=", "ongoing.childid")
+              .andOn("ongoing.day", "=", knex.raw("?", [day]))
+              .andOn("ongoing.date", "=", knex.raw("?", [date]));
+            if (time === "else") {
+              this.andOnNotIn("ongoing.time", ["15:00", "15:30", "00:00"]);
+            } else {
+              this.andOn("ongoing.time", "=", knex.raw("?", [time]));
+            }
+            if (guideid) {
+              this.andOn("child.guideid", "=", knex.raw("?", [guideid]));
+            }
+          })
+          .whereNotNull("fixed.childid")
+          .orWhereNotNull("ongoing.childid")
+          .groupBy(
+            "child.childid",
+            "child.first_name",
+            "child.last_name",
+            "child.classid",
+            "ongoing.time",
+            "fixed.time",
+            "ongoing.childid",
+            "fixed.childid"
+          );
+      })
+      // Add condition to exclude children with a row in ongoing with a different time
+      .whereRaw(
+        `
+      NOT EXISTS (
+        SELECT *
+        FROM ongoing
+        WHERE ongoing.childid = child.childid
+          AND ongoing.day = ?
+          AND ongoing.date = ?
+          AND ongoing.time != ?
       )
-      .leftJoin("ongoing", function () {
-        this.on("ongoing.childid", "=", "child.childid")
-          .andOn("ongoing.date", "=", "max_ongoing.max_date")
-          .andOn("ongoing.day", "=", knex.raw("?", [day]))
-          .andOn(function () {
-            this.on("ongoing.time", "=", knex.raw("?", [time])).orOnNotIn(
-              "ongoing.time",
-              ["15:00", "15:30", "00:00"]
-            );
-          });
-      })
-      .leftJoin("fixed", function () {
-        this.on("child.childid", "=", "fixed.childid")
-          .andOn("fixed.day", "=", knex.raw("?", [day]))
-          .andOn("fixed.time", "=", knex.raw("?", [time]));
-        if (guideid) {
-          this.andOn("child.guideid", "=", knex.raw("?", [guideid]));
-        }
-      })
-      .where(function () {
-        this.whereNotNull("fixed.childid").orWhereNotNull("ongoing.childid");
-      })
-      .groupBy(
-        "child.childid",
-        "child.first_name",
-        "child.last_name",
-        "child.classid",
-        "ongoing.time",
-        "fixed.time",
-        "ongoing.childid",
-        "fixed.childid"
+    `,
+        [day, date, time]
       );
 
     const result = await query;
