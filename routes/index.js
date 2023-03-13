@@ -285,12 +285,13 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
       .leftJoin("ongoing", function () {
         this.on("ongoing.childid", "=", "child.childid")
           .andOn("ongoing.date", "=", "max_ongoing.max_date")
-          .andOn("ongoing.day", "=", knex.raw("?", [day]));
-        if (time === "else") {
-          this.andOnNotIn("ongoing.time", ["15:00", "15:30", "00:00"]);
-        } else {
-          this.andOn("ongoing.time", "=", knex.raw("?", [time]));
-        }
+          .andOn("ongoing.day", "=", knex.raw("?", [day]))
+          .andOn(function () {
+            this.on("ongoing.time", "=", knex.raw("?", [time])).orOnNotIn(
+              "ongoing.time",
+              ["15:00", "15:30", "00:00"]
+            );
+          });
       })
       .leftJoin("fixed", function () {
         this.on("child.childid", "=", "fixed.childid")
