@@ -308,7 +308,8 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
         "child.classid",
         "ongoing.time",
         "fixed.time",
-        "fixed.childid"
+        "fixed.childid",
+        "ongoing.childid"
       );
 
     const result = await query;
