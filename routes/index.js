@@ -261,75 +261,57 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
   const date = req.query.date;
 
   try {
-    const firstQuery = knex
+    const query = knex
       .select(
         "child.childid",
         "child.first_name",
         "child.last_name",
         "child.classid",
-        knex.raw("COALESCE(ongoing.time, fixed.time) AS time"),
         knex.raw("CASE WHEN ? = 'else' THEN ongoing.time ELSE ? END AS time", [
           time,
           time,
         ])
       )
       .from("child")
-      .whereNotNull(function () {
-        this.select(knex.raw("COALESCE(ongoing.childid, fixed.childid)"))
-          .from("child")
-          .leftJoin("fixed", function () {
-            this.on("child.childid", "=", "fixed.childid")
-              .andOn("fixed.day", "=", knex.raw("?", [day]))
-              .andOn("fixed.time", "=", knex.raw("?", [time]));
-            if (guideid) {
-              this.andOn("child.guideid", "=", knex.raw("?", [guideid]));
-            }
-          })
-          .leftJoin("ongoing", function () {
-            this.on("child.childid", "=", "ongoing.childid")
-              .andOn("ongoing.day", "=", knex.raw("?", [day]))
-              .andOn("ongoing.date", "=", knex.raw("?", [date]))
-              .andOn(function () {
-                this.where(
-                  "ongoing.time",
-                  "=",
-                  knex.raw("?", [time])
-                ).orWhereIn("ongoing.time", ["15:00", "15:30", "00:00"]);
-              });
-            if (guideid) {
-              this.andOn("child.guideid", "=", knex.raw("?", [guideid]));
-            }
-          })
-          .whereNotNull("fixed.childid")
-          .orWhereNotNull("ongoing.childid")
-          .groupBy(
-            "child.childid",
-            "child.first_name",
-            "child.last_name",
-            "child.classid",
-            "ongoing.time",
-            "fixed.time",
-            "ongoing.childid",
-            "fixed.childid"
-          );
-      });
-
-    const query = knex
-      .select("*")
-      .from(function () {
-        this.select("*")
-          .from("child")
-          .whereRaw(`(${firstQuery}) IS NOT NULL`)
-          .as("temp");
+      .leftJoin("fixed", function () {
+        this.on("child.childid", "=", "fixed.childid")
+          .andOn("fixed.day", "=", knex.raw("?", [day]))
+          .andOn("fixed.time", "=", knex.raw("?", [time]))
+          .andOnNotExists(function () {
+            this.select("*")
+              .from("ongoing")
+              .whereRaw("child.childid = ongoing.childid")
+              .andWhere("ongoing.date", "=", knex.raw("?", [date]))
+              .andWhere("ongoing.day", "=", knex.raw("?", [day]));
+          });
+        if (guideid) {
+          this.andOn("child.guideid", "=", knex.raw("?", [guideid]));
+        }
       })
-      .whereNotExists(function () {
-        this.select("*")
-          .from("ongoing")
-          .where("ongoing.childid", "=", knex.raw("temp.childid"))
-          .andWhere("ongoing.day", "=", day)
-          .andWhere("ongoing.date", "=", date)
-          .andWhere("ongoing.time", "!=", time);
-      });
+      .leftJoin("ongoing", function () {
+        this.on("child.childid", "=", "ongoing.childid")
+          .andOn("ongoing.day", "=", knex.raw("?", [day]))
+          .andOn("ongoing.date", "=", knex.raw("?", [date]));
+        if (time === "else") {
+          this.andOnNotIn("ongoing.time", ["15:00", "15:30", "00:00"]);
+        } else {
+          this.andOn("ongoing.time", "=", knex.raw("?", [time]));
+        }
+        if (guideid) {
+          this.andOn("child.guideid", "=", knex.raw("?", [guideid]));
+        }
+      })
+      .where(function () {
+        this.whereNotNull("fixed.childid").orWhereNotNull("ongoing.childid");
+      })
+      .groupBy(
+        "child.childid",
+        "child.first_name",
+        "child.last_name",
+        "child.classid",
+        "ongoing.time",
+        "fixed.time"
+      );
 
     const result = await query;
 
