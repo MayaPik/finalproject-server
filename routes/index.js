@@ -267,7 +267,14 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
         "child.first_name",
         "child.last_name",
         "child.classid",
-        knex.raw("COALESCE(ongoing.time, fixed.time) AS time")
+        knex.raw(
+          "CASE " +
+            "WHEN ongoing.time IS NOT NULL THEN " +
+            "  ongoing.time " +
+            "ELSE " +
+            "  fixed.time " +
+            "END AS time"
+        )
       )
       .from("child")
       .leftJoin("fixed", function () {
@@ -282,29 +289,29 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
         this.on("child.childid", "=", "ongoing.childid")
           .andOn("ongoing.day", "=", knex.raw("?", [day]))
           .andOn("ongoing.date", "=", knex.raw("?", [date]));
-        if (time === "else") {
-          this.andOnNotIn("ongoing.time", ["15:00", "15:30", "00:00"]);
-        } else {
-          this.andOn("ongoing.time", "=", knex.raw("?", [time]));
-        }
         if (guideid) {
           this.andOn("child.guideid", "=", knex.raw("?", [guideid]));
         }
       })
-      .whereNotNull("fixed.childid")
-      .orWhereNotNull("ongoing.childid")
+      .where(function () {
+        this.whereNotNull("fixed.childid")
+          .andWhere(function () {
+            this.whereNull("ongoing.childid").orWhere(
+              "fixed.time",
+              "!=",
+              knex.raw("?", [time])
+            );
+          })
+          .orWhereNotNull("ongoing.childid");
+      })
       .groupBy(
         "child.childid",
         "child.first_name",
         "child.last_name",
         "child.classid",
         "ongoing.time",
-        "fixed.time",
-        "ongoing.childid",
-        "fixed.childid"
-      )
-      .orderBy(knex.raw("COALESCE(ongoing.time, fixed.time)"))
-      .distinctOn("child.childid");
+        "fixed.time"
+      );
 
     const result = await query;
 
