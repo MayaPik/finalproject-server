@@ -273,34 +273,38 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
       .leftJoin("ongoing", function () {
         this.on("child.childid", "=", "ongoing.childid")
           .andOn("ongoing.date", "=", knex.raw("?", [date]))
-          .andOn("ongoing.day", "=", knex.raw("?", [day]))
-          .andOn("ongoing.time", "like", knex.raw("?", [time]))
-          .andOn("child.guideid", "=", knex.raw("?", [guideid]));
+          .andOn("ongoing.day", "=", knex.raw("?", [day]));
+        if (time !== "else") {
+          this.andOn("ongoing.time", "=", knex.raw("?", [time]));
+        }
+        if (guideid) {
+          this.andOn("child.guideid", "=", knex.raw("?", [guideid]));
+        }
       })
       .leftJoin("fixed", function () {
-        this.on("child.childid", "=", "fixed.childid")
-          .andOn("fixed.day", "=", knex.raw("?", [day]))
-          .andOn("fixed.time", "like", knex.raw("?", [time]))
-          .andOn("child.guideid", "=", knex.raw("?", [guideid]));
+        this.on("child.childid", "=", "fixed.childid").andOn(
+          "fixed.day",
+          "=",
+          knex.raw("?", [day])
+        );
+        if (time !== "else") {
+          this.andOn("fixed.time", "=", knex.raw("?", [time]));
+        }
+        if (guideid) {
+          this.andOn("child.guideid", "=", knex.raw("?", [guideid]));
+        }
       })
       .where(function () {
-        this.where(function () {
-          this.whereNotNull("ongoing.time").andWhere(function () {
-            this.whereNull("fixed.time").orWhere(
-              "ongoing.time",
-              "=",
-              knex.raw("fixed.time")
-            );
-          });
-        })
-          .orWhere(function () {
-            this.whereNotNull("ongoing.time").andWhereNotNull("fixed.time");
-          })
-          .orWhere(function () {
-            this.whereNull("ongoing.time").andWhereNotNull("fixed.time");
-          });
+        this.whereNotNull("ongoing.childid").orWhereNotNull("fixed.childid");
       })
-      .orderBy("time", "asc");
+      .groupBy(
+        "child.childid",
+        "child.first_name",
+        "child.last_name",
+        "child.classid",
+        "ongoing.time",
+        "fixed.time"
+      );
 
     const result = await query;
 
