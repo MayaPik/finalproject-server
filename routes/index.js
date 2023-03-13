@@ -261,7 +261,7 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
   const date = req.query.date;
 
   try {
-    const query = knex
+    const firstQuery = knex
       .select(
         "child.childid",
         "child.first_name",
@@ -312,19 +312,23 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
             "ongoing.childid",
             "fixed.childid"
           );
+      });
+
+    const query = knex
+      .select("*")
+      .from(function () {
+        this.select("*")
+          .from("child")
+          .whereRaw(`(${firstQuery}) IS NOT NULL`)
+          .as("temp");
       })
       .whereNotExists(function () {
         this.select("*")
           .from("ongoing")
-          .where("ongoing.childid", "=", "child.childid")
-          .andWhere("ongoing.day", "=", knex.raw("?", [day]))
-          .andWhere("ongoing.date", "=", knex.raw("?", [date]))
-          .andWhere(function () {
-            this.where("ongoing.time", "<>", knex.raw("?", [time])).orWhereIn(
-              "ongoing.time",
-              ["15:00", "15:30", "00:00"]
-            );
-          });
+          .where("ongoing.childid", "=", knex.raw("temp.childid"))
+          .andWhere("ongoing.day", "=", day)
+          .andWhere("ongoing.date", "=", date)
+          .andWhere("ongoing.time", "!=", time);
       });
 
     const result = await query;
