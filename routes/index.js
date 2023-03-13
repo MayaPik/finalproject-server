@@ -288,12 +288,14 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
           .leftJoin("ongoing", function () {
             this.on("child.childid", "=", "ongoing.childid")
               .andOn("ongoing.day", "=", knex.raw("?", [day]))
-              .andOn("ongoing.date", "=", knex.raw("?", [date]));
-            if (time === "else") {
-              this.andOnNotIn("ongoing.time", ["15:00", "15:30", "00:00"]);
-            } else {
-              this.andOn("ongoing.time", "=", knex.raw("?", [time]));
-            }
+              .andOn("ongoing.date", "=", knex.raw("?", [date]))
+              .andOn(function () {
+                this.where(
+                  "ongoing.time",
+                  "=",
+                  knex.raw("?", [time])
+                ).orWhereIn("ongoing.time", ["15:00", "15:30", "00:00"]);
+              });
             if (guideid) {
               this.andOn("child.guideid", "=", knex.raw("?", [guideid]));
             }
@@ -311,20 +313,19 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
             "fixed.childid"
           );
       })
-      // Add condition to exclude children with a row in ongoing with a different time
-      .whereRaw(
-        `
-      NOT EXISTS (
-        SELECT *
-        FROM ongoing
-        WHERE ongoing.childid = child.childid
-          AND ongoing.day = ?
-          AND ongoing.date = ?
-          AND ongoing.time != ?
-      )
-    `,
-        [day, date, time]
-      );
+      .whereNotExists(function () {
+        this.select("*")
+          .from("ongoing")
+          .where("ongoing.childid", "=", "child.childid")
+          .andWhere("ongoing.day", "=", knex.raw("?", [day]))
+          .andWhere("ongoing.date", "=", knex.raw("?", [date]))
+          .andWhere(function () {
+            this.where("ongoing.time", "<>", knex.raw("?", [time])).orWhereIn(
+              "ongoing.time",
+              ["15:00", "15:30", "00:00"]
+            );
+          });
+      });
 
     const result = await query;
 
