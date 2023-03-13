@@ -270,15 +270,11 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
         knex.raw(
           "CASE " +
             "WHEN ? = 'else' THEN " +
-            "  CASE " +
-            "    WHEN ongoing.time IS NOT NULL THEN ongoing.time " +
-            "    ELSE fixed.time " +
-            "  END " +
-            "WHEN fixed.childid IS NOT NULL AND ongoing.childid IS NOT NULL AND fixed.day = ? AND ongoing.day = ? AND ongoing.time IS NOT NULL " +
-            "THEN ongoing.time " +
-            "ELSE fixed.time " +
+            "  COALESCE(ongoing.time, fixed.time) " +
+            "ELSE " +
+            "  COALESCE(ongoing.time, fixed.time, ?) " +
             "END AS time",
-          [time, day, day]
+          [time, time]
         )
       )
       .from("child")
