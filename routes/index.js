@@ -300,7 +300,15 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
         }
       })
       .where(function () {
-        this.whereNotNull("fixed.childid").orWhereNotNull("ongoing.childid");
+        this.whereNotNull("fixed.childid")
+          .andWhere(function () {
+            this.whereNull("ongoing.childid").orWhere(
+              "fixed.time",
+              "!=",
+              knex.raw("?", [time])
+            );
+          })
+          .orWhereNotNull("ongoing.childid");
       })
       .groupBy(
         "child.childid",
