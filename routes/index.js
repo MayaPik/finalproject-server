@@ -270,7 +270,7 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
         knex.raw(
           "CASE " +
             "WHEN ? = 'else' THEN " +
-            "  COALESCE(ongoing.time, fixed.time) " +
+            "  ongoing.time " +
             "ELSE " +
             "  COALESCE(ongoing.time, fixed.time, ?) " +
             "END AS time",
@@ -316,16 +316,7 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
         "child.last_name",
         "child.classid",
         "ongoing.time",
-        "fixed.time",
-        knex.raw(
-          "CASE " +
-            "WHEN ? = 'else' THEN " +
-            "  COALESCE(ongoing.time, fixed.time) " +
-            "ELSE " +
-            "  COALESCE(ongoing.time, fixed.time, ?) " +
-            "END",
-          [time, time]
-        )
+        "fixed.time"
       );
 
     const result = await query;
