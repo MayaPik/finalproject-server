@@ -309,7 +309,9 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
         "ongoing.time",
         "fixed.time",
         "fixed.childid",
-        "ongoing.childid"
+        "ongoing.childid",
+        "fixed.day",
+        "ongoing.day"
       );
 
     const result = await query;
