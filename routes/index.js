@@ -261,6 +261,13 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
   const date = req.query.date;
 
   try {
+    const ongoingSubquery = knex.select("childid").from("ongoing").where({
+      day: day,
+      date: date,
+      time: time,
+      guideid: guideid,
+    });
+
     const query = knex
       .select(
         "child.childid",
@@ -269,11 +276,12 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
         "child.classid",
         knex.raw(
           "CASE " +
-            "WHEN ongoing.time IS NOT NULL THEN " +
+            "WHEN ? = 'else' THEN " +
             "  ongoing.time " +
             "ELSE " +
-            "  fixed.time " +
-            "END AS time"
+            "  COALESCE(fixed.time, ?) " +
+            "END AS time",
+          [time, time]
         )
       )
       .from("child")
@@ -285,24 +293,20 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
           this.andOn("child.guideid", "=", knex.raw("?", [guideid]));
         }
       })
-      .leftJoin("ongoing", function () {
-        this.on("child.childid", "=", "ongoing.childid")
-          .andOn("ongoing.day", "=", knex.raw("?", [day]))
-          .andOn("ongoing.date", "=", knex.raw("?", [date]));
-        if (guideid) {
-          this.andOn("child.guideid", "=", knex.raw("?", [guideid]));
-        }
-      })
       .where(function () {
-        this.whereNotNull("fixed.childid")
-          .andWhere(function () {
-            this.whereNull("ongoing.childid").orWhere(
-              "fixed.time",
-              "!=",
-              knex.raw("?", [time])
-            );
-          })
-          .orWhereNotNull("ongoing.childid");
+        this.where(function () {
+          this.whereIn("child.childid", ongoingSubquery).orWhere(function () {
+            this.whereNotNull("fixed.childid");
+            if (time === "else") {
+              this.andWhereNotIn("fixed.time", ["15:00", "15:30", "00:00"]);
+            } else {
+              this.andWhere("fixed.time", "=", knex.raw("?", [time]));
+            }
+          });
+        });
+        if (guideid) {
+          this.andWhere("child.guideid", "=", knex.raw("?", [guideid]));
+        }
       })
       .groupBy(
         "child.childid",
