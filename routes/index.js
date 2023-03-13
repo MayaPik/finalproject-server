@@ -267,10 +267,14 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
         "child.first_name",
         "child.last_name",
         "child.classid",
-        knex.raw("CASE WHEN ? = 'else' THEN ongoing.time ELSE ? END AS time", [
-          time,
-          time,
-        ])
+        knex.raw(
+          "CASE WHEN ? = 'else' THEN ongoing.time " +
+            "WHEN fixed.childid IS NOT NULL AND ongoing.childid IS NOT NULL AND fixed.day = ? AND ongoing.day = ? " +
+            "THEN ongoing.time " +
+            "ELSE ? " +
+            "END AS time",
+          [time, day, day, time]
+        )
       )
       .from("child")
       .leftJoin("fixed", function () {
@@ -304,10 +308,7 @@ router.get(`/api/getAllChildrenOfHour`, isGuide, async (req, res) => {
         "child.classid",
         "ongoing.time",
         "fixed.time"
-      )
-      .orderByRaw("MAX(ongoing.childid) DESC")
-      .select("ongoing.time", "fixed.time")
-      .limit(1);
+      );
 
     const result = await query;
 
